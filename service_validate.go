@@ -246,7 +246,8 @@ func (validator *ServiceTicketValidator) ValidateUrl3(serviceURL *url.URL, ticke
 	}
 
 	q := u.Query()
-	q.Add("service", sanitisedURLString(serviceURL))
+	//q.Add("service", sanitisedURLString(serviceURL))
+	q.Add("service", serviceURL.String())
 	q.Add("ticket", ticket)
 	//q.Add("format", "json")
 	u.RawQuery = q.Encode()

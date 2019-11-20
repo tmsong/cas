@@ -21,7 +21,8 @@ func NewDefaultURLScheme(base *url.URL) *DefaultURLScheme {
 	return &DefaultURLScheme{
 		base:                base,
 		LoginPath:           "login",
-		LogoutPath:          "logout",
+		//LogoutPath:          "logout",
+		LogoutPath:          "cas/api/cas/logout",
 		ValidatePath:        "validate",
 		ServiceValidatePath: "serviceValidate",
 		RestEndpoint:        path.Join("v1", "tickets"),

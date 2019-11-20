@@ -17,7 +17,7 @@ var MyHandler = &myHandler{}
 var casURL string
 
 func init() {
-	flag.StringVar(&casURL, "url", "", "CAS server URL")
+	flag.StringVar(&casURL, "url", "", "CAS server LoginURL")
 }
 
 func main() {
@@ -39,7 +39,7 @@ func Example() {
 
 	url, _ := url.Parse(casURL)
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	server := &http.Server{

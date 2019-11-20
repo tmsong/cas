@@ -10,7 +10,7 @@ import (
 func ExampleRedirectToLogin() {
 	u, _ := url.Parse("https://cas.example.com")
 	c := NewClient(&Options{
-		URL: u,
+		LoginURL: u,
 	})
 
 	h := c.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func ExampleRedirectToLogin() {
 func ExampleRedirectToLogout() {
 	u, _ := url.Parse("https://cas.example.com")
 	c := NewClient(&Options{
-		URL: u,
+		LoginURL: u,
 	})
 
 	h := c.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +42,7 @@ func ExampleRedirectToLogout() {
 func ExampleIsAuthenticated() {
 	u, _ := url.Parse("https://cas.example.com")
 	c := NewClient(&Options{
-		URL: u,
+		LoginURL: u,
 	})
 
 	h := c.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +62,7 @@ func ExampleIsAuthenticated() {
 func ExampleUsername() {
 	u, _ := url.Parse("https://cas.example.com")
 	c := NewClient(&Options{
-		URL: u,
+		LoginURL: u,
 	})
 
 	h := c.HandleFunc(func(w http.ResponseWriter, r *http.Request) {

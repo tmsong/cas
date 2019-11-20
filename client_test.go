@@ -12,7 +12,7 @@ import (
 func TestUnauthenticatedRequestShouldRedirectToCasURL(t *testing.T) {
 	url, _ := url.Parse("https://cas.example.com/")
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	handler := client.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +69,7 @@ func TestInvalidServiceTicket(t *testing.T) {
 
 	url, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	handler := client.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -120,7 +120,7 @@ func TestValidServiceTicket(t *testing.T) {
 
 	url, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	message := "You are logged in, welcome client"
@@ -169,7 +169,7 @@ func TestGetUsernameFromServiceTicket(t *testing.T) {
 
 	url, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	message := "You are logged in, welcome"
@@ -222,7 +222,7 @@ func TestGetAttributesFromServiceTicket(t *testing.T) {
 
 	url, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	message := "You are logged in, welcome %s%s, your account is %s"
@@ -284,7 +284,7 @@ func TestSecondRequestShouldBeCookied(t *testing.T) {
 
 	url, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: url,
+		LoginURL: url,
 	})
 
 	message := "You are logged in, welcome %s%s, your account is %s"
@@ -357,7 +357,7 @@ func TestLogOut(t *testing.T) {
 
 	u, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: u,
+		LoginURL: u,
 	})
 
 	handler := client.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -457,7 +457,7 @@ func TestSingleLogOut(t *testing.T) {
 
 	u, _ := url.Parse(ts.URL)
 	client := NewClient(&Options{
-		URL: u,
+		LoginURL: u,
 	})
 
 	handler := client.HandleFunc(func(w http.ResponseWriter, r *http.Request) {

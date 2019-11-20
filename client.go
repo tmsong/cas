@@ -11,7 +11,8 @@ import (
 
 // Options : Client configuration options
 type Options struct {
-	URL            *url.URL     // URL to the CAS service
+	LoginURL       *url.URL     // LoginURL to the CAS login
+	BaseUrl        *url.URL     // LoginURL to the CAS service
 	Store          TicketStore  // Custom TicketStore, if nil a MemoryStore will be used
 	Client         *http.Client // Custom http client to allow options for http connections
 	SendService    bool         // Custom sendService to determine whether you need to send service param
@@ -19,6 +20,9 @@ type Options struct {
 	Cookie         *http.Cookie // http.Cookie options, uses Path, Domain, MaxAge, HttpOnly, & Secure
 	SessionStore   SessionStore
 	ValidationType string //CAS1,CAS2,CAS3
+	AppId          int64
+	AppKey         string
+	ClientHost     string
 }
 
 // Client implements the main protocol
@@ -32,6 +36,10 @@ type Client struct {
 	sendService bool
 
 	stValidator *ServiceTicketValidator
+
+	appId      int64
+	appKey     string
+	clientHost string
 }
 
 // NewClient creates a Client with the provided Options.
@@ -58,7 +66,7 @@ func NewClient(options *Options) *Client {
 	if options.URLScheme != nil {
 		urlScheme = options.URLScheme
 	} else {
-		urlScheme = NewDefaultURLScheme(options.URL)
+		urlScheme = NewDefaultURLScheme(options.LoginURL)
 	}
 
 	var client *http.Client
@@ -86,7 +94,10 @@ func NewClient(options *Options) *Client {
 		cookie:      cookie,
 		sessions:    sessions,
 		sendService: options.SendService,
-		stValidator: NewServiceTicketValidator(client, options.URL,options.ValidationType),
+		stValidator: NewServiceTicketValidator(client, options.BaseUrl, options.ValidationType),
+		appId:       options.AppId,
+		appKey:      options.AppKey,
+		clientHost:  options.ClientHost,
 	}
 }
 
@@ -103,7 +114,7 @@ func (c *Client) HandleFunc(h func(http.ResponseWriter, *http.Request)) http.Han
 	return c.Handle(http.HandlerFunc(h))
 }
 
-// requestURL determines an absolute URL from the http.Request.
+// requestURL determines an absolute LoginURL from the http.Request.
 func requestURL(r *http.Request) (*url.URL, error) {
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -125,26 +136,33 @@ func requestURL(r *http.Request) (*url.URL, error) {
 	return u, nil
 }
 
-// LoginUrlForRequest determines the CAS login URL for the http.Request.
+// LoginUrlForRequest determines the CAS login LoginURL for the http.Request.
 func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
 	u, err := c.urlScheme.Login()
 	if err != nil {
 		return "", err
 	}
 
-	service, err := requestURL(r)
-	if err != nil {
-		return "", err
-	}
+	//service, err := requestURL(r)
+	//if err != nil {
+	//	return "", err
+	//}
 
 	q := u.Query()
-	q.Add("service", sanitisedURLString(service))
+	//q.Add("service", c.clientHost)
+	q.Add("redirectUrl", c.clientHost)
+	jumpTo, err := requestURL(r)
+	if err == nil {
+		q.Add("jumpTo", jumpTo.String())
+	}
+	q.Add("appId", fmt.Sprintf("%d", c.appId))
+
 	u.RawQuery = q.Encode()
 
 	return u.String(), nil
 }
 
-// LogoutUrlForRequest determines the CAS logout URL for the http.Request.
+// LogoutUrlForRequest determines the CAS logout LoginURL for the http.Request.
 func (c *Client) LogoutUrlForRequest(r *http.Request) (string, error) {
 	u, err := c.urlScheme.Logout()
 	if err != nil {
@@ -165,7 +183,7 @@ func (c *Client) LogoutUrlForRequest(r *http.Request) (string, error) {
 	return u.String(), nil
 }
 
-// ServiceValidateUrlForRequest determines the CAS serviceValidate URL for the ticket and http.Request.
+// ServiceValidateUrlForRequest determines the CAS serviceValidate LoginURL for the ticket and http.Request.
 func (c *Client) ServiceValidateUrlForRequest(ticket string, r *http.Request) (string, error) {
 	service, err := requestURL(r)
 	if err != nil {
@@ -174,7 +192,7 @@ func (c *Client) ServiceValidateUrlForRequest(ticket string, r *http.Request) (s
 	return c.stValidator.ServiceValidateUrl(service, ticket)
 }
 
-// ValidateUrlForRequest determines the CAS validate URL for the ticket and http.Request.
+// ValidateUrlForRequest determines the CAS validate LoginURL for the ticket and http.Request.
 func (c *Client) ValidateUrlForRequest(ticket string, r *http.Request) (string, error) {
 	service, err := requestURL(r)
 	if err != nil {
@@ -183,7 +201,7 @@ func (c *Client) ValidateUrlForRequest(ticket string, r *http.Request) (string, 
 	return c.stValidator.ValidateUrl1(service, ticket)
 }
 
-// RedirectToLogout replies to the request with a redirect URL to log out of CAS.
+// RedirectToLogout replies to the request with a redirect LoginURL to log out of CAS.
 func (c *Client) RedirectToLogout(w http.ResponseWriter, r *http.Request) {
 	u, err := c.LogoutUrlForRequest(r)
 	if err != nil {
@@ -200,7 +218,7 @@ func (c *Client) RedirectToLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, u, http.StatusFound)
 }
 
-// RedirectToLogin replies to the request with a redirect URL to authenticate with CAS.
+// RedirectToLogin replies to the request with a redirect LoginURL to authenticate with CAS.
 func (c *Client) RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 	u, err := c.LoginUrlForRequest(r)
 	if err != nil {
@@ -217,11 +235,14 @@ func (c *Client) RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 
 // validateTicket performs CAS ticket validation with the given ticket and service.
 func (c *Client) validateTicket(ticket string, service *http.Request) error {
-	serviceURL, err := requestURL(service)
+	//serviceURL, err := requestURL(service)
+	//if err != nil {
+	//	return err
+	//}
+	serviceURL, err := url.Parse(c.clientHost)
 	if err != nil {
 		return err
 	}
-
 	success, err := c.stValidator.ValidateTicket(serviceURL, ticket)
 	if err != nil {
 		return err
@@ -237,7 +258,7 @@ func (c *Client) validateTicket(ticket string, service *http.Request) error {
 // getSession finds or creates a session for the request.
 //
 // A cookie is set on the response if one is not provided with the request.
-// Validates the ticket if the URL parameter is provided.
+// Validates the ticket if the LoginURL parameter is provided.
 func (c *Client) getSession(w http.ResponseWriter, r *http.Request) {
 	cookie := c.getCookie(w, r)
 

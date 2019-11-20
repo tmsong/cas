@@ -16,29 +16,28 @@ import (
 type myHandler struct{}
 
 var MyHandler = &myHandler{}
-var casURL = "https://sso.huowanggame.top/cas"
 
 func init() {
-	//flag.StringVar(&casURL, "url", "", "CAS server URL")
+	//flag.StringVar(&casURL, "url", "", "CAS server LoginURL")
 }
 
 func main() {
 	flag.Parse()
-
-	if casURL == "" {
-		flag.Usage()
-		return
-	}
 
 	glog.Info("Starting up")
 
 	m := http.NewServeMux()
 	m.Handle("/", MyHandler)
 
-	url, _ := url.Parse(casURL)
+	casLoginURL, _ := url.Parse("https://sso.huowanggame.top/")
+	casBaseURL, _ := url.Parse("https://sso.huowanggame.top/cas")
 	client := cas.NewClient(&cas.Options{
-		URL:            url,
+		LoginURL:       casLoginURL,
+		BaseUrl:        casBaseURL,
 		ValidationType: "CAS3",
+		AppKey:         "golangSDK",
+		AppId:          10009,
+		ClientHost:     "http://127.0.0.1:8080/cas/c_back",
 	})
 
 	server := &http.Server{
