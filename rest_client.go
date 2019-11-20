@@ -20,10 +20,11 @@ type ServiceTicket string
 
 // RestOptions provide options for the RestClient
 type RestOptions struct {
-	CasURL     *url.URL
-	ServiceURL *url.URL
-	Client     *http.Client
-	URLScheme  URLScheme
+	CasURL         *url.URL
+	ServiceURL     *url.URL
+	Client         *http.Client
+	URLScheme      URLScheme
+	ValidationType string
 }
 
 // RestClient uses the rest protocol provided by cas
@@ -58,7 +59,7 @@ func NewRestClient(options *RestOptions) *RestClient {
 		urlScheme:   urlScheme,
 		serviceURL:  options.ServiceURL,
 		client:      client,
-		stValidator: NewServiceTicketValidator(client, options.CasURL),
+		stValidator: NewServiceTicketValidator(client, options.CasURL, options.ValidationType),
 	}
 }
 

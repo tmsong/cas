@@ -10,16 +10,16 @@ import (
 
 	"github.com/golang/glog"
 
-	"gopkg.in/cas.v1"
+	"gopkg.in/cas.v2"
 )
 
 type myHandler struct{}
 
 var MyHandler = &myHandler{}
-var casURL string
+var casURL = "https://sso.huowanggame.top/cas"
 
 func init() {
-	flag.StringVar(&casURL, "url", "", "CAS server URL")
+	//flag.StringVar(&casURL, "url", "", "CAS server URL")
 }
 
 func main() {
@@ -37,7 +37,8 @@ func main() {
 
 	url, _ := url.Parse(casURL)
 	client := cas.NewClient(&cas.Options{
-		URL: url,
+		URL:            url,
+		ValidationType: "CAS3",
 	})
 
 	server := &http.Server{

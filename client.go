@@ -11,13 +11,14 @@ import (
 
 // Options : Client configuration options
 type Options struct {
-	URL          *url.URL     // URL to the CAS service
-	Store        TicketStore  // Custom TicketStore, if nil a MemoryStore will be used
-	Client       *http.Client // Custom http client to allow options for http connections
-	SendService  bool         // Custom sendService to determine whether you need to send service param
-	URLScheme    URLScheme    // Custom url scheme, can be used to modify the request urls for the client
-	Cookie       *http.Cookie // http.Cookie options, uses Path, Domain, MaxAge, HttpOnly, & Secure
-	SessionStore SessionStore
+	URL            *url.URL     // URL to the CAS service
+	Store          TicketStore  // Custom TicketStore, if nil a MemoryStore will be used
+	Client         *http.Client // Custom http client to allow options for http connections
+	SendService    bool         // Custom sendService to determine whether you need to send service param
+	URLScheme      URLScheme    // Custom url scheme, can be used to modify the request urls for the client
+	Cookie         *http.Cookie // http.Cookie options, uses Path, Domain, MaxAge, HttpOnly, & Secure
+	SessionStore   SessionStore
+	ValidationType string //CAS1,CAS2,CAS3
 }
 
 // Client implements the main protocol
@@ -85,7 +86,7 @@ func NewClient(options *Options) *Client {
 		cookie:      cookie,
 		sessions:    sessions,
 		sendService: options.SendService,
-		stValidator: NewServiceTicketValidator(client, options.URL),
+		stValidator: NewServiceTicketValidator(client, options.URL,options.ValidationType),
 	}
 }
 
@@ -179,7 +180,7 @@ func (c *Client) ValidateUrlForRequest(ticket string, r *http.Request) (string, 
 	if err != nil {
 		return "", err
 	}
-	return c.stValidator.ValidateUrl(service, ticket)
+	return c.stValidator.ValidateUrl1(service, ticket)
 }
 
 // RedirectToLogout replies to the request with a redirect URL to log out of CAS.

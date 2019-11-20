@@ -52,12 +52,12 @@ type AuthenticationResponse struct {
 }
 
 // UserAttributes represents additional data about the user
-type UserAttributes map[string][]string
+type UserAttributes map[string][]interface{}
 
 // Get retrieves an attribute by name.
 //
 // Attributes are stored in arrays. Get will only return the first element.
-func (a UserAttributes) Get(name string) string {
+func (a UserAttributes) Get(name string) interface{} {
 	if v, ok := a[name]; ok {
 		return v[0]
 	}
@@ -174,4 +174,11 @@ func addRubycasAttribute(attributes UserAttributes, key, value string) {
 	}
 
 	return
+}
+
+type ServiceResponse3 struct {
+	ServiceResponse ServiceResponse
+}
+type ServiceResponse struct {
+	AuthenticationSuccess AuthenticationResponse
 }
