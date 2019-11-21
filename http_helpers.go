@@ -3,6 +3,7 @@ package cas
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -149,4 +150,67 @@ func MemberOf(r *http.Request) []string {
 	}
 
 	return nil
+}
+
+// MemberOf returns the list of groups which the user belongs to.
+func GetCurrentUserId(r *http.Request) int64 {
+	if a := getAuthenticationResponse(r); a != nil {
+		if a.Attributes != nil && len(a.Attributes) > 0 {
+			if v, ok := a.Attributes["uid"]; ok {
+				uid, err := strconv.ParseInt(v[0].(string), 10, 64)
+				if err != nil {
+					return 0
+				}
+				return uid
+			}
+		}
+		return 0
+	}
+	return 0
+}
+
+func HasPermission(w http.ResponseWriter, r *http.Request) bool {
+	c := getClient(r)
+	if c == nil {
+		err := "cas: redirect to cas failed as no client associated with request"
+		http.Error(w, err, http.StatusInternalServerError)
+		return false
+	}
+	if c.PermissionValidateForRequest(r) != nil {
+		return false
+	}
+	return true
+}
+
+func RoleList(w http.ResponseWriter, r *http.Request) bool {
+	c := getClient(r)
+	if c == nil {
+		err := "cas: redirect to cas failed as no client associated with request"
+		http.Error(w, err, http.StatusInternalServerError)
+		return false
+	}
+	c.RoleList(r)
+	return true
+}
+
+func PermissionList(w http.ResponseWriter, r *http.Request, roleId int64) bool {
+	c := getClient(r)
+	if c == nil {
+		err := "cas: redirect to cas failed as no client associated with request"
+		http.Error(w, err, http.StatusInternalServerError)
+		return false
+	}
+	c.PermissionList(r, roleId)
+	return true
+}
+
+func UserInfo(w http.ResponseWriter, r *http.Request) bool {
+	c := getClient(r)
+	if c == nil {
+		err := "cas: redirect to cas failed as no client associated with request"
+		http.Error(w, err, http.StatusInternalServerError)
+		return false
+	}
+	c.UserInfo(r)
+	return true
 }

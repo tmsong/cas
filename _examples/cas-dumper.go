@@ -29,15 +29,24 @@ func main() {
 	m := http.NewServeMux()
 	m.Handle("/", MyHandler)
 
-	casLoginURL, _ := url.Parse("https://sso.huowanggame.top/")
+	casLoginURL, _ := url.Parse("https://sso.huowanggame.top")
 	casBaseURL, _ := url.Parse("https://sso.huowanggame.top/cas")
+	casBackURL, _ := url.Parse("http://127.0.0.1:8080/cas/c_back")
+	openURL, _ := url.Parse("https://sso.huowanggame.top")
 	client := cas.NewClient(&cas.Options{
 		LoginURL:       casLoginURL,
 		BaseUrl:        casBaseURL,
 		ValidationType: "CAS3",
-		AppKey:         "golangSDK",
+		AppKey:         "sso",
 		AppId:          10009,
-		ClientHost:     "http://127.0.0.1:8080/cas/c_back",
+		ClientHost:     casBackURL,
+		OpenUrl:        openURL,
+		Cookie: &http.Cookie{
+			MaxAge:   86400,
+			HttpOnly: true,
+			Secure:   false,
+			Path:     "/",
+		},
 	})
 
 	server := &http.Server{
@@ -62,6 +71,14 @@ func (h *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		cas.RedirectToLogin(w, r)
 		return
 	}
+	if !cas.HasPermission(w, r) {
+		fmt.Println("no permission")
+		return
+	}
+
+	cas.UserInfo(w, r)
+	cas.PermissionList(w, r,53)
+	cas.RoleList(w, r)
 
 	if r.URL.Path == "/logout" {
 		cas.RedirectToLogout(w, r)

@@ -2,11 +2,11 @@ package cas
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
+	"github.com/golang/glog"
 	"net/http"
 	"net/url"
-
-	"github.com/golang/glog"
 )
 
 // Options : Client configuration options
@@ -22,7 +22,8 @@ type Options struct {
 	ValidationType string //CAS1,CAS2,CAS3
 	AppId          int64
 	AppKey         string
-	ClientHost     string
+	ClientHost     *url.URL
+	OpenUrl        *url.URL
 }
 
 // Client implements the main protocol
@@ -36,10 +37,11 @@ type Client struct {
 	sendService bool
 
 	stValidator *ServiceTicketValidator
+	pmValidator *PermissionValidator
 
 	appId      int64
 	appKey     string
-	clientHost string
+	clientHost *url.URL
 }
 
 // NewClient creates a Client with the provided Options.
@@ -95,6 +97,7 @@ func NewClient(options *Options) *Client {
 		sessions:    sessions,
 		sendService: options.SendService,
 		stValidator: NewServiceTicketValidator(client, options.BaseUrl, options.ValidationType),
+		pmValidator: NewPermissionValidator(client, options.OpenUrl, CreateBaseParams(options.AppId, options.AppKey)),
 		appId:       options.AppId,
 		appKey:      options.AppKey,
 		clientHost:  options.ClientHost,
@@ -150,10 +153,10 @@ func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
 
 	q := u.Query()
 	//q.Add("service", c.clientHost)
-	q.Add("redirectUrl", c.clientHost)
+	q.Add("redirectUrl", c.clientHost.String())
 	jumpTo, err := requestURL(r)
 	if err == nil {
-		q.Add("jumpTo", jumpTo.String())
+		q.Add("jumpto", jumpTo.String())
 	}
 	q.Add("appId", fmt.Sprintf("%d", c.appId))
 
@@ -239,11 +242,7 @@ func (c *Client) validateTicket(ticket string, service *http.Request) error {
 	//if err != nil {
 	//	return err
 	//}
-	serviceURL, err := url.Parse(c.clientHost)
-	if err != nil {
-		return err
-	}
-	success, err := c.stValidator.ValidateTicket(serviceURL, ticket)
+	success, err := c.stValidator.ValidateTicket(c.clientHost, ticket)
 	if err != nil {
 		return err
 	}
@@ -299,6 +298,9 @@ func (c *Client) getSession(w http.ResponseWriter, r *http.Request) {
 			}
 
 			setAuthenticationResponse(r, t)
+			if jumpto := r.URL.Query().Get("jumpto"); jumpto != "" {
+				http.Redirect(w, r, jumpto, http.StatusFound)
+			}
 			return
 		} else {
 			if glog.V(2) {
@@ -392,4 +394,44 @@ func (c *Client) clearSession(w http.ResponseWriter, r *http.Request) {
 // deleteSession removes the session from the client
 func (c *Client) deleteSession(id string) {
 	c.sessions.Delete(id)
+}
+
+// 判断是否有权限 from the client
+func (c *Client) PermissionValidateForRequest(r *http.Request) error {
+	service, err := requestURL(r)
+	if err != nil {
+		return err
+	}
+	uid := GetCurrentUserId(r)
+	if uid <= 0 {
+		return errors.New("please login")
+	}
+	return c.pmValidator.HasPermission(uid, service.Path)
+}
+
+// 获取角色列表 from the client
+func (c *Client) RoleList(r *http.Request) (interface{}, error) {
+	uid := GetCurrentUserId(r)
+	if uid <= 0 {
+		return nil, errors.New("please login")
+	}
+	return c.pmValidator.RoleList(uid)
+}
+
+// 获取功能列表 from the client
+func (c *Client) PermissionList(r *http.Request, roleId int64) (interface{}, error) {
+	uid := GetCurrentUserId(r)
+	if uid <= 0 {
+		return nil, errors.New("please login")
+	}
+	return c.pmValidator.PermissionList(uid, roleId)
+}
+
+// 获取用户信息 from the client
+func (c *Client) UserInfo(r *http.Request) (interface{}, error) {
+	uid := GetCurrentUserId(r)
+	if uid <= 0 {
+		return nil, errors.New("please login")
+	}
+	return c.pmValidator.UserInfo(uid)
 }
