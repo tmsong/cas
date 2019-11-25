@@ -8,6 +8,7 @@ import (
 // URLScheme creates the url which are required to handle the cas protocol.
 type URLScheme interface {
 	Login() (*url.URL, error)
+	Index() (*url.URL, error)
 	Logout() (*url.URL, error)
 	Validate() (*url.URL, error)
 	ServiceValidate() (*url.URL, error)
@@ -19,8 +20,9 @@ type URLScheme interface {
 // NewDefaultURLScheme creates a URLScheme which uses the cas default urls
 func NewDefaultURLScheme(base *url.URL) *DefaultURLScheme {
 	return &DefaultURLScheme{
-		base:                base,
-		LoginPath:           "login",
+		base:      base,
+		LoginPath: "login",
+		IndexPath: "",
 		//LogoutPath:          "logout",
 		LogoutPath:          "cas/api/cas/logout",
 		ValidatePath:        "validate",
@@ -34,6 +36,7 @@ func NewDefaultURLScheme(base *url.URL) *DefaultURLScheme {
 type DefaultURLScheme struct {
 	base                *url.URL
 	LoginPath           string
+	IndexPath           string
 	LogoutPath          string
 	ValidatePath        string
 	ServiceValidatePath string
@@ -43,6 +46,11 @@ type DefaultURLScheme struct {
 // Login returns the url for the cas login page
 func (scheme *DefaultURLScheme) Login() (*url.URL, error) {
 	return scheme.createURL(scheme.LoginPath)
+}
+
+// Login returns the url for the cas login page
+func (scheme *DefaultURLScheme) Index() (*url.URL, error) {
+	return scheme.createURL(scheme.IndexPath)
 }
 
 // Logout returns the url for the cas logut page

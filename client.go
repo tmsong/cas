@@ -141,7 +141,7 @@ func requestURL(r *http.Request) (*url.URL, error) {
 
 // LoginUrlForRequest determines the CAS login LoginURL for the http.Request.
 func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
-	u, err := c.urlScheme.Login()
+	u, err := c.urlScheme.Index()
 	if err != nil {
 		return "", err
 	}
@@ -153,7 +153,7 @@ func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
 
 	q := u.Query()
 	//q.Add("service", c.clientHost)
-	q.Add("redirectUrl", c.clientHost.String())
+	//q.Add("redirectUrl", c.clientHost.String())
 	jumpTo, err := requestURL(r)
 	if err == nil {
 		q.Add("jumpto", jumpTo.String())
