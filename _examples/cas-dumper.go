@@ -38,7 +38,7 @@ func main() {
 		BaseUrl:        casBaseURL,
 		ValidationType: "CAS3",
 		AppKey:         "sso",
-		AppId:          10009,
+		AppId:          111111,
 		ClientHost:     casBackURL,
 		OpenUrl:        openURL,
 		Cookie: &http.Cookie{
@@ -77,7 +77,7 @@ func (h *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cas.UserInfo(w, r)
-	cas.PermissionList(w, r,53)
+	cas.PermissionList(w, r, 53)
 	cas.RoleList(w, r)
 
 	if r.URL.Path == "/logout" {
