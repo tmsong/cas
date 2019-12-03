@@ -71,14 +71,14 @@ func (h *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		cas.RedirectToLogin(w, r)
 		return
 	}
-	if !cas.HasPermission(w, r) {
+	if !cas.HasPermission(r) {
 		fmt.Println("no permission")
 		return
 	}
 
-	cas.UserInfo(w, r)
-	cas.PermissionList(w, r, 53)
-	cas.RoleList(w, r)
+	cas.UserInfo(r)
+	cas.PermissionList(r, 53)
+	cas.RoleList(r)
 
 	if r.URL.Path == "/logout" {
 		cas.RedirectToLogout(w, r)

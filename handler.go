@@ -24,14 +24,14 @@ func (ch *clientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		glog.Infof("cas: handling %v request for %v", r.Method, r.URL)
 	}
 
-	setClient(r, ch.c)
+	SetClient(r, ch.c)
 
 	if isSingleLogoutRequest(r) {
 		ch.performSingleLogout(w, r)
 		return
 	}
 
-	ch.c.getSession(w, r)
+	ch.c.GetSession(w, r)
 	ch.h.ServeHTTP(w, r)
 	return
 }

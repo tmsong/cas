@@ -2,6 +2,7 @@ package cas
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,14 +16,14 @@ const ( // emulating enums is actually pretty ugly in go.
 )
 
 // setClient associates a Client with a http.Request.
-func setClient(r *http.Request, c *Client) {
+func SetClient(r *http.Request, c *Client) {
 	ctx := context.WithValue(r.Context(), clientKey, c)
 	r2 := r.WithContext(ctx)
 	*r = *r2
 }
 
 // getClient retrieves the Client associated with the http.Request.
-func getClient(r *http.Request) *Client {
+func GetClient(r *http.Request) *Client {
 	if c := r.Context().Value(clientKey); c != nil {
 		return c.(*Client)
 	}
@@ -33,7 +34,7 @@ func getClient(r *http.Request) *Client {
 // RedirectToLogin allows CAS protected handlers to redirect a request
 // to the CAS login page.
 func RedirectToLogin(w http.ResponseWriter, r *http.Request) {
-	c := getClient(r)
+	c := GetClient(r)
 	if c == nil {
 		err := "cas: redirect to cas failed as no client associated with request"
 		http.Error(w, err, http.StatusInternalServerError)
@@ -46,7 +47,7 @@ func RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 // RedirectToLogout allows CAS protected handlers to redirect a request
 // to the CAS logout page.
 func RedirectToLogout(w http.ResponseWriter, r *http.Request) {
-	c := getClient(r)
+	c := GetClient(r)
 	if c == nil {
 		err := "cas: redirect to cas failed as no client associated with request"
 		http.Error(w, err, http.StatusInternalServerError)
@@ -169,11 +170,9 @@ func GetCurrentUserId(r *http.Request) int64 {
 	return 0
 }
 
-func HasPermission(w http.ResponseWriter, r *http.Request) bool {
-	c := getClient(r)
+func HasPermission(r *http.Request) bool {
+	c := GetClient(r)
 	if c == nil {
-		err := "cas: redirect to cas failed as no client associated with request"
-		http.Error(w, err, http.StatusInternalServerError)
 		return false
 	}
 	if c.PermissionValidateForRequest(r) != nil {
@@ -182,35 +181,26 @@ func HasPermission(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func RoleList(w http.ResponseWriter, r *http.Request) bool {
-	c := getClient(r)
+func RoleList(r *http.Request) ([]RoleListResponse, error) {
+	c := GetClient(r)
 	if c == nil {
-		err := "cas: redirect to cas failed as no client associated with request"
-		http.Error(w, err, http.StatusInternalServerError)
-		return false
+		return nil, errors.New("no client associated with request")
 	}
-	c.RoleList(r)
-	return true
+	return c.RoleList(r)
 }
 
-func PermissionList(w http.ResponseWriter, r *http.Request, roleId int64) bool {
-	c := getClient(r)
+func PermissionList(r *http.Request, roleId int64) ([]PermissionListResponse, error) {
+	c := GetClient(r)
 	if c == nil {
-		err := "cas: redirect to cas failed as no client associated with request"
-		http.Error(w, err, http.StatusInternalServerError)
-		return false
+		return nil, errors.New("no client associated with request")
 	}
-	c.PermissionList(r, roleId)
-	return true
+	return c.PermissionList(r, roleId)
 }
 
-func UserInfo(w http.ResponseWriter, r *http.Request) bool {
-	c := getClient(r)
+func UserInfo(r *http.Request) (*UserInfoResponse, error) {
+	c := GetClient(r)
 	if c == nil {
-		err := "cas: redirect to cas failed as no client associated with request"
-		http.Error(w, err, http.StatusInternalServerError)
-		return false
+		return nil, errors.New("no client associated with request")
 	}
-	c.UserInfo(r)
-	return true
+	return c.UserInfo(r)
 }

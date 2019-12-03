@@ -14,7 +14,7 @@ func (c *Client) Handler(h http.Handler) http.Handler {
 			glog.Infof("cas: handling %v request for %v", r.Method, r.URL)
 		}
 
-		setClient(r, c)
+		SetClient(r, c)
 
 		if !IsAuthenticated(r) {
 			RedirectToLogin(w, r)

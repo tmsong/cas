@@ -258,7 +258,7 @@ func (c *Client) validateTicket(ticket string, service *http.Request) error {
 //
 // A cookie is set on the response if one is not provided with the request.
 // Validates the ticket if the LoginURL parameter is provided.
-func (c *Client) getSession(w http.ResponseWriter, r *http.Request) {
+func (c *Client) GetSession(w http.ResponseWriter, r *http.Request) {
 	cookie := c.getCookie(w, r)
 
 	if s, ok := c.sessions.Get(cookie.Value); ok {
@@ -410,7 +410,7 @@ func (c *Client) PermissionValidateForRequest(r *http.Request) error {
 }
 
 // 获取角色列表 from the client
-func (c *Client) RoleList(r *http.Request) (interface{}, error) {
+func (c *Client) RoleList(r *http.Request) ([]RoleListResponse, error) {
 	uid := GetCurrentUserId(r)
 	if uid <= 0 {
 		return nil, errors.New("please login")
@@ -419,7 +419,7 @@ func (c *Client) RoleList(r *http.Request) (interface{}, error) {
 }
 
 // 获取功能列表 from the client
-func (c *Client) PermissionList(r *http.Request, roleId int64) (interface{}, error) {
+func (c *Client) PermissionList(r *http.Request, roleId int64) ([]PermissionListResponse, error) {
 	uid := GetCurrentUserId(r)
 	if uid <= 0 {
 		return nil, errors.New("please login")
@@ -428,7 +428,7 @@ func (c *Client) PermissionList(r *http.Request, roleId int64) (interface{}, err
 }
 
 // 获取用户信息 from the client
-func (c *Client) UserInfo(r *http.Request) (interface{}, error) {
+func (c *Client) UserInfo(r *http.Request) (*UserInfoResponse, error) {
 	uid := GetCurrentUserId(r)
 	if uid <= 0 {
 		return nil, errors.New("please login")

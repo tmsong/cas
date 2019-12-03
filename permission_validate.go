@@ -40,7 +40,7 @@ func (validator *PermissionValidator) HasPermission(userId int64, url string) er
 	return nil
 }
 
-func (validator *PermissionValidator) RoleList(userId int64) (interface{}, error) {
+func (validator *PermissionValidator) RoleList(userId int64) ([]RoleListResponse, error) {
 	u, body, err := validator.RoleListUrl(userId)
 	if err != nil {
 		return nil, err
@@ -53,9 +53,9 @@ func (validator *PermissionValidator) RoleList(userId int64) (interface{}, error
 	}
 	re := []RoleListResponse{}
 	InterfaceToStruct(r.Data, &re)
-	return &re, nil
+	return re, nil
 }
-func (validator *PermissionValidator) PermissionList(userId, roleId int64) (*[]PermissionListResponse, error) {
+func (validator *PermissionValidator) PermissionList(userId, roleId int64) ([]PermissionListResponse, error) {
 	u, body, err := validator.PermissionListUrl(userId, roleId)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (validator *PermissionValidator) PermissionList(userId, roleId int64) (*[]P
 	}
 	re := []PermissionListResponse{}
 	InterfaceToStruct(r.Data, &re)
-	return &re, nil
+	return re, nil
 }
 
 func (validator *PermissionValidator) UserInfo(userId int64) (*UserInfoResponse, error) {
