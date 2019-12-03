@@ -8,11 +8,11 @@ import (
 )
 
 // NewServiceTicketValidator create a new *ServiceTicketValidator
-func NewPermissionValidator(client *http.Client, permissionURL *url.URL, baseParams map[string]interface{}) *PermissionValidator {
+func NewPermissionValidator(client *http.Client, permissionURL *url.URL, parent *Client) *PermissionValidator {
 	return &PermissionValidator{
 		client:        client,
 		permissionURL: permissionURL,
-		baseParams:    baseParams,
+		parent:        parent,
 	}
 }
 
@@ -20,7 +20,7 @@ func NewPermissionValidator(client *http.Client, permissionURL *url.URL, basePar
 type PermissionValidator struct {
 	client        *http.Client
 	permissionURL *url.URL
-	baseParams    map[string]interface{}
+	parent        *Client
 }
 
 // ValidateTicket validates the service ticket for the given server. The method will try to use the service validate
@@ -31,7 +31,7 @@ func (validator *PermissionValidator) HasPermission(userId int64, url string) er
 	if err != nil {
 		return err
 	}
-	ret := PostByJson(u, body)
+	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
 	_ = JsonDecode(ret, &r)
 	if r.Code != 200 {
@@ -45,7 +45,7 @@ func (validator *PermissionValidator) RoleList(userId int64) ([]RoleListResponse
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body)
+	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
 	_ = JsonDecode(ret, &r)
 	if r.Code != 200 {
@@ -60,7 +60,7 @@ func (validator *PermissionValidator) PermissionList(userId, roleId int64) ([]Pe
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body)
+	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
 	_ = JsonDecode(ret, &r)
 	if r.Code != 200 {
@@ -76,7 +76,7 @@ func (validator *PermissionValidator) UserInfo(userId int64) (*UserInfoResponse,
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body)
+	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
 	_ = JsonDecode(ret, &r)
 	if r.Code != 200 {
@@ -92,7 +92,7 @@ func (validator *PermissionValidator) HasPermissionUrl(userId int64, url string)
 	if err != nil {
 		return "", "", err
 	}
-	params := validator.baseParams
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	params["userId"] = userId
 	params["url"] = url
 	return u.String(), JsonEncode(params), nil
@@ -114,7 +114,7 @@ func (validator *PermissionValidator) RoleListUrl(userId int64) (string, string,
 	if err != nil {
 		return "", "", err
 	}
-	params := validator.baseParams
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	params["userId"] = userId
 	return u.String(), JsonEncode(params), nil
 }
@@ -123,7 +123,7 @@ func (validator *PermissionValidator) PermissionListUrl(userId, roleId int64) (s
 	if err != nil {
 		return "", "", err
 	}
-	params := validator.baseParams
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	params["userId"] = userId
 	params["roleId"] = roleId
 	return u.String(), JsonEncode(params), nil
@@ -133,7 +133,7 @@ func (validator *PermissionValidator) UserInfoUrl(userId int64) (string, string,
 	if err != nil {
 		return "", "", err
 	}
-	params := validator.baseParams
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	params["userId"] = userId
 	return u.String(), JsonEncode(params), nil
 }

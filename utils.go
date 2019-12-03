@@ -5,20 +5,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/golang/glog"
+	"github.com/tmsong/hlog"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 )
 
-/**
- * @note
- * 获取md5 hash串
- * @param string text 源串
- *
- * @return string
- */
 func MD5Hex(text string) string {
 	hash := md5.Sum([]byte(text))
 	return hex.EncodeToString(hash[:])
@@ -33,11 +26,12 @@ func CreateBaseParams(appId int64, appKey string) map[string]interface{} {
 	return r
 }
 
-func PostByJson(url string, bodyJson string) string {
-	payload := strings.NewReader(bodyJson)
-	req, _ := http.NewRequest("POST", url, payload)
+func PostByJson(realUrl string, reqBodyStr string, l *hlog.Logger) string {
+	payload := strings.NewReader(reqBodyStr)
+	req, _ := http.NewRequest(http.MethodPost, realUrl, payload)
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("User-Agent", "Golang CAS client gopkg.in/cas")
+	req.Header.Add("User-Agent", "Golang CAS client")
+	l.AddHttpTrace(req)
 	res, _ := http.DefaultClient.Do(req)
 	defer func() {
 		if res.Body != nil {
@@ -45,10 +39,9 @@ func PostByJson(url string, bodyJson string) string {
 		}
 	}()
 	body, _ := ioutil.ReadAll(res.Body)
-	if glog.V(2) {
-		glog.Infof("post json url %v , body %v , response %v", url, bodyJson, string(body))
-	}
-	return string(body)
+	resBodyStr := string(body)
+	defer printHttpLog(l, req, res, reqBodyStr, resBodyStr)
+	return resBodyStr
 }
 
 func JsonEncode(data interface{}) string {

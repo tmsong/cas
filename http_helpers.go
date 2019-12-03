@@ -3,6 +3,7 @@ package cas
 import (
 	"context"
 	"errors"
+	"github.com/tmsong/hlog"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,6 +19,18 @@ const ( // emulating enums is actually pretty ugly in go.
 // setClient associates a Client with a http.Request.
 func SetClient(r *http.Request, c *Client) {
 	ctx := context.WithValue(r.Context(), clientKey, c)
+	r2 := r.WithContext(ctx)
+	*r = *r2
+}
+
+//setClientWithLogger associates a new logger client with a http.Request
+func SetClientWithLogger(r *http.Request, c *Client, l *hlog.Logger) {
+	newCli := &Client{c.cli, l}
+	newCli.stValidator = NewServiceTicketValidator(c.stValidator.client,
+		c.stValidator.casURL, c.stValidator.validationType, newCli)
+	newCli.pmValidator = NewPermissionValidator(c.pmValidator.client,
+		c.pmValidator.permissionURL, newCli)
+	ctx := context.WithValue(r.Context(), clientKey, newCli)
 	r2 := r.WithContext(ctx)
 	*r = *r2
 }

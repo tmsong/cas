@@ -7,16 +7,15 @@ import (
 	"net/url"
 	"path"
 	"strings"
-
-	"github.com/golang/glog"
 )
 
 // NewServiceTicketValidator create a new *ServiceTicketValidator
-func NewServiceTicketValidator(client *http.Client, casURL *url.URL, validationType string) *ServiceTicketValidator {
+func NewServiceTicketValidator(client *http.Client, casURL *url.URL, validationType string, parent *Client) *ServiceTicketValidator {
 	return &ServiceTicketValidator{
 		client:         client,
 		casURL:         casURL,
 		validationType: validationType,
+		parent:         parent,
 	}
 }
 
@@ -25,15 +24,13 @@ type ServiceTicketValidator struct {
 	client         *http.Client
 	casURL         *url.URL
 	validationType string
+	parent         *Client
 }
 
 // ValidateTicket validates the service ticket for the given server. The method will try to use the service validate
 // endpoint of the cas >= 2 protocol, if the service validate endpoint not available, the function will use the cas 1
 // validate endpoint.
 func (validator *ServiceTicketValidator) ValidateTicket(serviceURL *url.URL, ticket string) (*AuthenticationResponse, error) {
-	if glog.V(2) {
-		glog.Infof("Validating ticket %v for service %v", ticket, serviceURL)
-	}
 	if validator.validationType == "CAS1" {
 		return validator.validateTicketCas1(serviceURL, ticket)
 	} else if validator.validationType == "CAS2" {
@@ -51,36 +48,27 @@ func (validator *ServiceTicketValidator) validateTicketCas2(serviceURL *url.URL,
 	if err != nil {
 		return nil, err
 	}
-	r.Header.Add("User-Agent", "Golang CAS client gopkg.in/cas")
-	if glog.V(2) {
-		glog.Infof("Attempting ticket validation with %v", r.URL)
-	}
+	validator.parent.logger.AddHttpTrace(r)
+	r.Header.Add("User-Agent", "Golang CAS client")
+
+	var resBodyStr string
 	resp, err := validator.client.Do(r)
+	defer resp.Body.Close()
+	defer printHttpLog(validator.parent.logger, r, resp, "", string(resBodyStr))
 	if err != nil {
 		return nil, err
-	}
-	if glog.V(2) {
-		glog.Infof("Request %v %v returned %v",
-			r.Method, r.URL,
-			resp.Status)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	resBodyStr = string(body)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("cas: validate ticket: %v", string(body))
-	}
-	if glog.V(2) {
-		glog.Infof("Received authentication response\n%v", string(body))
 	}
 	success, err := ParseServiceResponse(body)
 	if err != nil {
 		return nil, err
-	}
-	if glog.V(2) {
-		glog.Infof("Parsed ServiceResponse: %#v", success)
 	}
 	return success, nil
 }
@@ -111,26 +99,21 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 	if err != nil {
 		return nil, err
 	}
+	validator.parent.logger.AddHttpTrace(r)
+	r.Header.Add("User-Agent", "Golang CAS client")
 
-	r.Header.Add("User-Agent", "Golang CAS client gopkg.in/cas")
-
-	if glog.V(2) {
-		glog.Infof("Attempting ticket validation with %v", r.URL)
-	}
-
+	var resBodyStr string
 	resp, err := validator.client.Do(r)
+	defer resp.Body.Close()
+	defer printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
 	if err != nil {
 		return nil, err
 	}
-
-	if glog.V(2) {
-		glog.Infof("Request %v %v returned %v",
-			r.Method, r.URL,
-			resp.Status)
-	}
-
 	data, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	resBodyStr = string(data)
 
 	if err != nil {
 		return nil, err
@@ -142,20 +125,12 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 		return nil, fmt.Errorf("cas: validate ticket: %v", body)
 	}
 
-	if glog.V(2) {
-		glog.Infof("Received authentication response\n%v", body)
-	}
-
 	if body == "no\n\n" {
 		return nil, nil // not logged in
 	}
 
 	success := &AuthenticationResponse{
 		User: body[4 : len(body)-1],
-	}
-
-	if glog.V(2) {
-		glog.Infof("Parsed ServiceResponse: %#v", success)
 	}
 
 	return success, nil
@@ -187,52 +162,34 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 	if err != nil {
 		return nil, err
 	}
+	validator.parent.logger.AddHttpTrace(r)
+	r.Header.Add("User-Agent", "Golang CAS client")
 
-	r.Header.Add("User-Agent", "Golang CAS client gopkg.in/cas")
-
-	if glog.V(2) {
-		glog.Infof("Attempting ticket validation with %v", r.URL)
-	}
-
+	var resBodyStr string
 	resp, err := validator.client.Do(r)
+	defer resp.Body.Close()
+	defer printHttpLog(validator.parent.logger, r, resp, "", string(resBodyStr))
 	if err != nil {
 		return nil, err
 	}
-
-	if glog.V(2) {
-		glog.Infof("Request %v %v returned %v",
-			r.Method, r.URL,
-			resp.Status)
-	}
-
-	data, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-
-	body := string(data)
+	resBodyStr = string(body)
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("cas: validate ticket: %v", body)
+		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}
 
-	if glog.V(2) {
-		glog.Infof("Received authentication response\n%v", body)
-	}
-
-	if body == "no\n\n" {
+	if resBodyStr == "no\n\n" {
 		return nil, nil // not logged in
 	}
 	//todo 这里由于无法解析带时区的时间字符串，故先替换掉
-	body = strings.Replace(body, "[Asia/Shanghai]", "", 1)
-	success, err := ParseServiceResponse([]byte(body))
+	resBodyStr = strings.Replace(resBodyStr, "[Asia/Shanghai]", "", 1)
+	success, err := ParseServiceResponse([]byte(resBodyStr))
 	if err != nil {
 		return nil, err
-	}
-	if glog.V(2) {
-		glog.Infof("Parsed ServiceResponse: %#v", success)
 	}
 	return success, nil
 }

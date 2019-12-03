@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
-	"github.com/golang/glog"
+	"github.com/tmsong/hlog"
 	"net/http"
 	"net/url"
 )
@@ -24,10 +24,10 @@ type Options struct {
 	AppKey         string
 	ClientHost     *url.URL
 	OpenUrl        *url.URL
+	Logger         *hlog.Logger
 }
 
-// Client implements the main protocol
-type Client struct {
+type cli struct {
 	tickets   TicketStore
 	client    *http.Client
 	urlScheme URLScheme
@@ -44,12 +44,14 @@ type Client struct {
 	clientHost *url.URL
 }
 
+// Client implements the main protocol
+type Client struct {
+	*cli
+	logger *hlog.Logger
+}
+
 // NewClient creates a Client with the provided Options.
 func NewClient(options *Options) *Client {
-	if glog.V(2) {
-		glog.Infof("cas: new client with options %v", options)
-	}
-
 	var tickets TicketStore
 	if options.Store != nil {
 		tickets = options.Store
@@ -88,20 +90,21 @@ func NewClient(options *Options) *Client {
 			Secure:   false,
 		}
 	}
-
-	return &Client{
+	c := &Client{logger: options.Logger}
+	c.cli = &cli{
 		tickets:     tickets,
 		client:      client,
 		urlScheme:   urlScheme,
 		cookie:      cookie,
 		sessions:    sessions,
 		sendService: options.SendService,
-		stValidator: NewServiceTicketValidator(client, options.BaseUrl, options.ValidationType),
-		pmValidator: NewPermissionValidator(client, options.OpenUrl, CreateBaseParams(options.AppId, options.AppKey)),
+		stValidator: NewServiceTicketValidator(client, options.BaseUrl, options.ValidationType, c),
+		pmValidator: NewPermissionValidator(client, options.OpenUrl, c),
 		appId:       options.AppId,
 		appKey:      options.AppKey,
 		clientHost:  options.ClientHost,
 	}
+	return c
 }
 
 // Handle wraps a http.Handler to provide CAS authentication for the handler.
@@ -211,12 +214,8 @@ func (c *Client) RedirectToLogout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	if glog.V(2) {
-		glog.Infof("Logging out, redirecting client to %v with status %v",
-			u, http.StatusFound)
-	}
-
+	c.logger.Debugf("Logging out, redirecting client to %v with status %v",
+		u, http.StatusFound)
 	c.clearSession(w, r)
 	http.Redirect(w, r, u, http.StatusFound)
 }
@@ -228,11 +227,7 @@ func (c *Client) RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	if glog.V(2) {
-		glog.Infof("Redirecting client to %v with status %v", u, http.StatusFound)
-	}
-
+	c.logger.Debugf("Redirecting client to %v with status %v", u, http.StatusFound)
 	http.Redirect(w, r, u, http.StatusFound)
 }
 
@@ -263,20 +258,14 @@ func (c *Client) GetSession(w http.ResponseWriter, r *http.Request) {
 
 	if s, ok := c.sessions.Get(cookie.Value); ok {
 		if t, err := c.tickets.Read(s); err == nil {
-			if glog.V(1) {
-				glog.Infof("Re-used ticket %s for %s", s, t.User)
-			}
+			c.logger.Debugf("Re-used ticket %s for %s", s, t.User)
 
 			setAuthenticationResponse(r, t)
 			return
 		} else {
-			if glog.V(2) {
-				glog.Infof("Ticket %v not in %T: %v", s, c.tickets, err)
-			}
+			c.logger.Warningf("Ticket %v not in %T: %v", s, c.tickets, err)
 
-			if glog.V(1) {
-				glog.Infof("Clearing ticket %s, no longer exists in ticket store", s)
-			}
+			c.logger.Infof("Clearing ticket %s, no longer exists in ticket store", s)
 
 			clearCookie(w, cookie)
 		}
@@ -284,18 +273,14 @@ func (c *Client) GetSession(w http.ResponseWriter, r *http.Request) {
 
 	if ticket := r.URL.Query().Get("ticket"); ticket != "" {
 		if err := c.validateTicket(ticket, r); err != nil {
-			if glog.V(2) {
-				glog.Infof("Error validating ticket: %v", err)
-			}
+			c.logger.Errorf("Error validating ticket: %v", err)
 			return // allow ServeHTTP()
 		}
 
 		c.setSession(cookie.Value, ticket)
 
 		if t, err := c.tickets.Read(ticket); err == nil {
-			if glog.V(1) {
-				glog.Infof("Validated ticket %s for %s", ticket, t.User)
-			}
+			c.logger.Debugf("Validated ticket %s for %s", ticket, t.User)
 
 			setAuthenticationResponse(r, t)
 			if jumpto := r.URL.Query().Get("jumpto"); jumpto != "" {
@@ -303,13 +288,9 @@ func (c *Client) GetSession(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		} else {
-			if glog.V(2) {
-				glog.Infof("Ticket %v not in %T: %v", ticket, c.tickets, err)
-			}
+			c.logger.Warningf("Ticket %v not in %T: %v", ticket, c.tickets, err)
 
-			if glog.V(1) {
-				glog.Infof("Clearing ticket %s, no longer exists in ticket store", ticket)
-			}
+			c.logger.Infof("Clearing ticket %s, no longer exists in ticket store", ticket)
 
 			clearCookie(w, cookie)
 		}
@@ -332,9 +313,7 @@ func (c *Client) getCookie(w http.ResponseWriter, r *http.Request) *http.Cookie 
 			Secure:   c.cookie.Secure,
 		}
 
-		if glog.V(2) {
-			glog.Infof("Setting %v cookie with value: %v", cookie.Name, cookie.Value)
-		}
+		c.logger.Debugf("Setting %v cookie with value: %v", cookie.Name, cookie.Value)
 
 		r.AddCookie(cookie) // so we can find it later if required
 		http.SetCookie(w, cookie)
@@ -366,9 +345,7 @@ func clearCookie(w http.ResponseWriter, c *http.Cookie) {
 
 // setSession stores the session id to ticket mapping in the Client.
 func (c *Client) setSession(id string, ticket string) {
-	if glog.V(2) {
-		glog.Infof("Recording session, %v -> %v", id, ticket)
-	}
+	c.logger.Debugf("Recording session, %v -> %v", id, ticket)
 
 	c.sessions.Set(id, ticket)
 }
@@ -379,10 +356,7 @@ func (c *Client) clearSession(w http.ResponseWriter, r *http.Request) {
 
 	if s, ok := c.sessions.Get(cookie.Value); ok {
 		if err := c.tickets.Delete(s); err != nil {
-			fmt.Printf("Failed to remove %v from %T: %v\n", cookie.Value, c.tickets, err)
-			if glog.V(2) {
-				glog.Errorf("Failed to remove %v from %T: %v", cookie.Value, c.tickets, err)
-			}
+			c.logger.Errorf("Failed to remove %v from %T: %v", cookie.Value, c.tickets, err)
 		}
 
 		c.deleteSession(s)
