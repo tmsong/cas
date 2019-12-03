@@ -1,4 +1,4 @@
-module gopkg.in/cas.v2
+module cas-go-client
 
 go 1.12
 
