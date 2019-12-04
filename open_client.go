@@ -56,6 +56,17 @@ func (c *OpenClient) DepartmentInfoUrl(departmentId int64) (string, string, erro
 	return u.String(), JsonEncode(params), nil
 }
 
+func (c *OpenClient) AllDepartmentInfoUrl() (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/sso/dept/get_all_dept"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	return u.String(), JsonEncode(params), nil
+}
+
+///////////////////////////////////////////////////////
+
 func (c *OpenClient) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
 	u, body, err := c.UserInfoDetailUrl(userId, employeeId)
 	if err != nil {
@@ -84,6 +95,22 @@ func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose,
 		return nil, errors.New("error")
 	}
 	re := &DepartmentInfoRespose{}
+	InterfaceToStruct(r.Data, re)
+	return re, nil
+}
+
+func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
+	u, body, err := c.AllDepartmentInfoUrl()
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	_ = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, errors.New("error")
+	}
+	re := []*DepartmentInfoRespose{}
 	InterfaceToStruct(r.Data, re)
 	return re, nil
 }

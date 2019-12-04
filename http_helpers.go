@@ -115,6 +115,16 @@ func Attributes(r *http.Request) UserAttributes {
 	return nil
 }
 
+// Attrs returns the authenticated users attributes.
+func GetUserAttrs(r *http.Request) *UserAttrs {
+	if a := getAuthenticationResponse(r); a != nil {
+		tmp := &UserAttrsStruct{}
+		InterfaceToStruct(a.Attributes, &tmp)
+		return tmp.ToUserAttrs()
+	}
+	return nil
+}
+
 // AuthenticationDate returns the date and time that authentication was performed.
 //
 // This may return time.IsZero if Authentication Date information is not included

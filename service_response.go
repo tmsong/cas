@@ -177,3 +177,69 @@ type ServiceResponse3 struct {
 type ServiceResponse struct {
 	AuthenticationSuccess AuthenticationResponse
 }
+
+type UserAttrsStruct struct {
+	CredentialType                         []string  `json:"credentialType"`
+	Uid                                    []int64   `json:"uid"`
+	IsFromNewLogin                         []bool    `json:"isFromNewLogin"`
+	AuthenticationDate                     []float64 `json:"authenticationDate"`
+	AuthenticationMethod                   []string  `json:"authenticationMethod"`
+	DisplayName                            []string  `json:"displayName"`
+	SuccessfulAuthenticationHandlers       []string  `json:"successfulAuthenticationHandlers"`
+	Name                                   []string  `json:"name"`
+	EmployeeId                             []string  `json:"employeeId"`
+	LongTermAuthenticationRequestTokenUsed []bool    `json:"longTermAuthenticationRequestTokenUsed"`
+	Email                                  []string  `json:"email"`
+}
+
+func (this *UserAttrsStruct) ToUserAttrs() *UserAttrs {
+	ret := &UserAttrs{}
+	if len(this.CredentialType) > 0 {
+		ret.CredentialType = this.CredentialType[0]
+	}
+	if len(this.Uid) > 0 {
+		ret.Uid = this.Uid[0]
+	}
+	if len(this.IsFromNewLogin) > 0 {
+		ret.IsFromNewLogin = this.IsFromNewLogin[0]
+	}
+	if len(this.AuthenticationDate) > 0 {
+		ret.AuthenticationDate = this.AuthenticationDate[0]
+	}
+	if len(this.AuthenticationMethod) > 0 {
+		ret.AuthenticationMethod = this.AuthenticationMethod[0]
+	}
+	if len(this.DisplayName) > 0 {
+		ret.DisplayName = this.DisplayName[0]
+	}
+	if len(this.SuccessfulAuthenticationHandlers) > 0 {
+		ret.SuccessfulAuthenticationHandlers = this.SuccessfulAuthenticationHandlers[0]
+	}
+	if len(this.Name) > 0 {
+		ret.Name = this.Name[0]
+	}
+	if len(this.EmployeeId) > 0 {
+		ret.EmployeeId = this.EmployeeId[0]
+	}
+	if len(this.LongTermAuthenticationRequestTokenUsed) > 0 {
+		ret.LongTermAuthenticationRequestTokenUsed = this.LongTermAuthenticationRequestTokenUsed[0]
+	}
+	if len(this.Email) > 0 {
+		ret.Email = this.Email[0]
+	}
+	return ret
+}
+
+type UserAttrs struct {
+	CredentialType                         string  `json:"credentialType"`
+	Uid                                    int64   `json:"uid"`
+	IsFromNewLogin                         bool    `json:"isFromNewLogin"`
+	AuthenticationDate                     float64 `json:"authenticationDate"`
+	AuthenticationMethod                   string  `json:"authenticationMethod"`
+	DisplayName                            string  `json:"displayName"`
+	SuccessfulAuthenticationHandlers       string  `json:"successfulAuthenticationHandlers"`
+	Name                                   string  `json:"name"`
+	EmployeeId                             string  `json:"employeeId"`
+	LongTermAuthenticationRequestTokenUsed bool    `json:"longTermAuthenticationRequestTokenUsed"`
+	Email                                  string  `json:"email"`
+}

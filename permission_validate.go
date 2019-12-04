@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 )
 
 // NewServiceTicketValidator create a new *ServiceTicketValidator
@@ -120,6 +119,22 @@ func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*Depar
 	return re, nil
 }
 
+func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
+	u, body, err := validator.AllDepartmentInfoUrl()
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, validator.parent.logger)
+	r := PermissionResponse{}
+	_ = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, errors.New("error")
+	}
+	re := []*DepartmentInfoRespose{}
+	InterfaceToStruct(r.Data, re)
+	return re, nil
+}
+
 func (validator *PermissionValidator) HasPermissionUrl(userId int64, url string) (string, string, error) {
 	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/has_premission"))
 	if err != nil {
@@ -180,7 +195,7 @@ func (validator *PermissionValidator) UserInfoDetailUrl(userId int64, employeeId
 	}
 	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	if len(employeeId) == 0 {
-		params["userId"] = userId
+		params["uid"] = userId
 	} else {
 		params["employeeId"] = employeeId
 	}
@@ -193,6 +208,15 @@ func (validator *PermissionValidator) DepartmentInfoUrl(departmentId int64) (str
 		return "", "", err
 	}
 	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
-	params["id"] = strconv.FormatInt(departmentId, 10)
+	params["id"] = departmentId
+	return u.String(), JsonEncode(params), nil
+}
+
+func (validator *PermissionValidator) AllDepartmentInfoUrl() (string, string, error) {
+	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/dept/get_all_dept"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	return u.String(), JsonEncode(params), nil
 }
