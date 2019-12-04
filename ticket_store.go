@@ -24,4 +24,7 @@ type TicketStore interface {
 
 	// Clear removes all of the AuthenticationResponse data from the store.
 	Clear() error
+
+	// Copy itself and set a new parent client
+	CopyWithParent(parent *Client) TicketStore
 }

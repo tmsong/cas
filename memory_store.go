@@ -58,3 +58,8 @@ func (s *MemoryStore) Clear() error {
 	s.mu.Unlock()
 	return nil
 }
+
+//do nothing
+func (s *MemoryStore) CopyWithParent(c *Client) TicketStore {
+	return s
+}

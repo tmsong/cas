@@ -13,6 +13,9 @@ type SessionStore interface {
 
 	// Delete the session
 	Delete(sessionID string) error
+
+	// Copy itself and set a new parent client
+	CopyWithParent(parent *Client) SessionStore
 }
 
 // NewMemorySessionStore create a default SessionStore that uses memory
@@ -49,4 +52,9 @@ func (m *memorySessionStore) Delete(sessionID string) error {
 	m.mu.Unlock()
 
 	return nil
+}
+
+//do nothing
+func (m *memorySessionStore) CopyWithParent(c *Client) SessionStore {
+	return m
 }
