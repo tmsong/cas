@@ -326,6 +326,14 @@ func (c *Client) GetLogger() *hlog.Logger {
 	return c.logger
 }
 
+func (c *Client) SetSessionStore(store SessionStore) {
+	c.sessions = store
+}
+
+func (c *Client) SetTicketStore(store TicketStore) {
+	c.tickets = store
+}
+
 // newSessionId generates a new opaque session identifier for use in the cookie.
 func newSessionID() string {
 	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

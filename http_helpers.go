@@ -30,6 +30,8 @@ func SetClientWithLogger(r *http.Request, c *Client, l *hlog.Logger) {
 		c.stValidator.casURL, c.stValidator.validationType, newCli)
 	newCli.pmValidator = NewPermissionValidator(c.pmValidator.client,
 		c.pmValidator.permissionURL, newCli)
+	newCli.SetSessionStore(c.sessions.CopyWithParent(newCli))
+	newCli.SetTicketStore(c.tickets.CopyWithParent(newCli))
 	ctx := context.WithValue(r.Context(), clientKey, newCli)
 	r2 := r.WithContext(ctx)
 	*r = *r2
