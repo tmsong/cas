@@ -210,10 +210,26 @@ func PermissionList(r *http.Request, roleId int64) ([]PermissionListResponse, er
 	return c.PermissionList(r, roleId)
 }
 
-func UserInfo(r *http.Request) (*UserInfoResponse, error) {
+func UserInfo(r *http.Request, userId int64) (*UserInfoResponse, error) {
 	c := GetClient(r)
 	if c == nil {
 		return nil, errors.New("no client associated with request")
 	}
-	return c.UserInfo(r)
+	return c.UserInfo(userId)
+}
+
+func UserInfoDetail(r *http.Request, userId int64) (*UserInfoResponse, error) {
+	c := GetClient(r)
+	if c == nil {
+		return nil, errors.New("no client associated with request")
+	}
+	return c.UserInfo(userId)
+}
+
+func DepartmentInfo(r *http.Request, userId int64) (*UserInfoResponse, error) {
+	c := GetClient(r)
+	if c == nil {
+		return nil, errors.New("no client associated with request")
+	}
+	return c.UserInfo(userId)
 }

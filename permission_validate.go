@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 )
 
 // NewServiceTicketValidator create a new *ServiceTicketValidator
@@ -87,6 +88,38 @@ func (validator *PermissionValidator) UserInfo(userId int64) (*UserInfoResponse,
 	return re, nil
 }
 
+func (validator *PermissionValidator) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
+	u, body, err := validator.UserInfoDetailUrl(userId, employeeId)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, validator.parent.logger)
+	r := PermissionResponse{}
+	_ = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, errors.New("error")
+	}
+	re := &UserInfoDetailResponse{}
+	InterfaceToStruct(r.Data, re)
+	return re, nil
+}
+
+func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose, error) {
+	u, body, err := validator.DepartmentInfoUrl(departmentId)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, validator.parent.logger)
+	r := PermissionResponse{}
+	_ = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, errors.New("error")
+	}
+	re := &DepartmentInfoRespose{}
+	InterfaceToStruct(r.Data, re)
+	return re, nil
+}
+
 func (validator *PermissionValidator) HasPermissionUrl(userId int64, url string) (string, string, error) {
 	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/has_premission"))
 	if err != nil {
@@ -118,6 +151,7 @@ func (validator *PermissionValidator) RoleListUrl(userId int64) (string, string,
 	params["userId"] = userId
 	return u.String(), JsonEncode(params), nil
 }
+
 func (validator *PermissionValidator) PermissionListUrl(userId, roleId int64) (string, string, error) {
 	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/upm/role/permission_list"))
 	if err != nil {
@@ -128,6 +162,7 @@ func (validator *PermissionValidator) PermissionListUrl(userId, roleId int64) (s
 	params["roleId"] = roleId
 	return u.String(), JsonEncode(params), nil
 }
+
 func (validator *PermissionValidator) UserInfoUrl(userId int64) (string, string, error) {
 	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/user_info"))
 	if err != nil {
@@ -135,5 +170,29 @@ func (validator *PermissionValidator) UserInfoUrl(userId int64) (string, string,
 	}
 	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
 	params["userId"] = userId
+	return u.String(), JsonEncode(params), nil
+}
+
+func (validator *PermissionValidator) UserInfoDetailUrl(userId int64, employeeId string) (string, string, error) {
+	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/get_user_info_detail"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
+	if len(employeeId) == 0 {
+		params["userId"] = userId
+	} else {
+		params["employeeId"] = employeeId
+	}
+	return u.String(), JsonEncode(params), nil
+}
+
+func (validator *PermissionValidator) DepartmentInfoUrl(departmentId int64) (string, string, error) {
+	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/dept/get_dept"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
+	params["id"] = strconv.FormatInt(departmentId, 10)
 	return u.String(), JsonEncode(params), nil
 }

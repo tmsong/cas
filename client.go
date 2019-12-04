@@ -402,10 +402,16 @@ func (c *Client) PermissionList(r *http.Request, roleId int64) ([]PermissionList
 }
 
 // 获取用户信息 from the client
-func (c *Client) UserInfo(r *http.Request) (*UserInfoResponse, error) {
-	uid := GetCurrentUserId(r)
-	if uid <= 0 {
-		return nil, errors.New("please login")
-	}
-	return c.pmValidator.UserInfo(uid)
+func (c *Client) UserInfo(userId int64) (*UserInfoResponse, error) {
+	return c.pmValidator.UserInfo(userId)
+}
+
+// 获取用户信息详情 from the client
+func (c *Client) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
+	return c.pmValidator.UserInfoDetail(userId, employeeId)
+}
+
+// 获取部门信息详情 from the client
+func (c *Client) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose, error) {
+	return c.pmValidator.DepartmentInfo(departmentId)
 }
