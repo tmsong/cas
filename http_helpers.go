@@ -120,7 +120,11 @@ func GetUserAttrs(r *http.Request) *UserAttrs {
 	if a := getAuthenticationResponse(r); a != nil {
 		tmp := &UserAttrsStruct{}
 		InterfaceToStruct(a.Attributes, &tmp)
-		return tmp.ToUserAttrs()
+		if ret, err := tmp.ToUserAttrs(); err != nil {
+			return nil
+		} else {
+			return ret
+		}
 	}
 	return nil
 }

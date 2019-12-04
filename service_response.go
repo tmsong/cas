@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -179,32 +180,27 @@ type ServiceResponse struct {
 }
 
 type UserAttrsStruct struct {
-	CredentialType                         []string  `json:"credentialType"`
-	Uid                                    []int64   `json:"uid"`
-	IsFromNewLogin                         []bool    `json:"isFromNewLogin"`
-	AuthenticationDate                     []float64 `json:"authenticationDate"`
-	AuthenticationMethod                   []string  `json:"authenticationMethod"`
-	DisplayName                            []string  `json:"displayName"`
-	SuccessfulAuthenticationHandlers       []string  `json:"successfulAuthenticationHandlers"`
-	Name                                   []string  `json:"name"`
-	EmployeeId                             []string  `json:"employeeId"`
-	LongTermAuthenticationRequestTokenUsed []bool    `json:"longTermAuthenticationRequestTokenUsed"`
-	Email                                  []string  `json:"email"`
+	CredentialType                   []string `json:"credentialType"`
+	Uid                              []string `json:"uid"`
+	AuthenticationMethod             []string `json:"authenticationMethod"`
+	DisplayName                      []string `json:"displayName"`
+	SuccessfulAuthenticationHandlers []string `json:"successfulAuthenticationHandlers"`
+	Name                             []string `json:"name"`
+	EmployeeId                       []string `json:"employeeId"`
+	Email                            []string `json:"email"`
 }
 
-func (this *UserAttrsStruct) ToUserAttrs() *UserAttrs {
+func (this *UserAttrsStruct) ToUserAttrs() (*UserAttrs, error) {
 	ret := &UserAttrs{}
+	var err error
 	if len(this.CredentialType) > 0 {
 		ret.CredentialType = this.CredentialType[0]
 	}
 	if len(this.Uid) > 0 {
-		ret.Uid = this.Uid[0]
-	}
-	if len(this.IsFromNewLogin) > 0 {
-		ret.IsFromNewLogin = this.IsFromNewLogin[0]
-	}
-	if len(this.AuthenticationDate) > 0 {
-		ret.AuthenticationDate = this.AuthenticationDate[0]
+		ret.Uid, err = strconv.ParseInt(this.Uid[0], 10, 64)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if len(this.AuthenticationMethod) > 0 {
 		ret.AuthenticationMethod = this.AuthenticationMethod[0]
@@ -221,25 +217,19 @@ func (this *UserAttrsStruct) ToUserAttrs() *UserAttrs {
 	if len(this.EmployeeId) > 0 {
 		ret.EmployeeId = this.EmployeeId[0]
 	}
-	if len(this.LongTermAuthenticationRequestTokenUsed) > 0 {
-		ret.LongTermAuthenticationRequestTokenUsed = this.LongTermAuthenticationRequestTokenUsed[0]
-	}
 	if len(this.Email) > 0 {
 		ret.Email = this.Email[0]
 	}
-	return ret
+	return ret, nil
 }
 
 type UserAttrs struct {
-	CredentialType                         string  `json:"credentialType"`
-	Uid                                    int64   `json:"uid"`
-	IsFromNewLogin                         bool    `json:"isFromNewLogin"`
-	AuthenticationDate                     float64 `json:"authenticationDate"`
-	AuthenticationMethod                   string  `json:"authenticationMethod"`
-	DisplayName                            string  `json:"displayName"`
-	SuccessfulAuthenticationHandlers       string  `json:"successfulAuthenticationHandlers"`
-	Name                                   string  `json:"name"`
-	EmployeeId                             string  `json:"employeeId"`
-	LongTermAuthenticationRequestTokenUsed bool    `json:"longTermAuthenticationRequestTokenUsed"`
-	Email                                  string  `json:"email"`
+	CredentialType                   string `json:"credentialType"`
+	Uid                              int64  `json:"uid"`
+	AuthenticationMethod             string `json:"authenticationMethod"`
+	DisplayName                      string `json:"displayName"`
+	SuccessfulAuthenticationHandlers string `json:"successfulAuthenticationHandlers"`
+	Name                             string `json:"name"`
+	EmployeeId                       string `json:"employeeId"`
+	Email                            string `json:"email"`
 }
