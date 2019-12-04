@@ -54,17 +54,19 @@ func (validator *ServiceTicketValidator) validateTicketCas2(serviceURL *url.URL,
 	var resBodyStr string
 	resp, err := validator.client.Do(r)
 	defer resp.Body.Close()
-	defer printHttpLog(validator.parent.logger, r, resp, "", string(resBodyStr))
 	if err != nil {
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
 	}
 	resBodyStr = string(body)
+	printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("cas: validate ticket: %v", string(body))
+		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}
 	success, err := ParseServiceResponse(body)
 	if err != nil {
@@ -105,19 +107,17 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 	var resBodyStr string
 	resp, err := validator.client.Do(r)
 	defer resp.Body.Close()
-	defer printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
 	if err != nil {
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
 	}
 	resBodyStr = string(data)
-
-	if err != nil {
-		return nil, err
-	}
+	printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
 
 	body := string(data)
 
@@ -168,16 +168,17 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 	var resBodyStr string
 	resp, err := validator.client.Do(r)
 	defer resp.Body.Close()
-	defer printHttpLog(validator.parent.logger, r, resp, "", string(resBodyStr))
 	if err != nil {
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
 	}
 	resBodyStr = string(body)
-
+	printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}
