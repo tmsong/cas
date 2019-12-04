@@ -24,11 +24,13 @@ type OpenClient struct {
 	openUrl *url.URL
 }
 
-func NewOpenClient(client *http.Client, openURL *url.URL, l *hlog.Logger) *OpenClient {
+func NewOpenClient(appId int64, appKey string, client *http.Client, openURL *url.URL, l *hlog.Logger) *OpenClient {
 	return &OpenClient{
 		client:  client,
 		openUrl: openURL,
 		logger:  l,
+		appId:   appId,
+		appKey:  appKey,
 	}
 }
 
