@@ -322,6 +322,10 @@ func (c *Client) getCookie(w http.ResponseWriter, r *http.Request) *http.Cookie 
 	return cookie
 }
 
+func (c *Client) GetLogger() *hlog.Logger {
+	return c.logger
+}
+
 // newSessionId generates a new opaque session identifier for use in the cookie.
 func newSessionID() string {
 	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
