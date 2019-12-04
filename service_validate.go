@@ -64,7 +64,7 @@ func (validator *ServiceTicketValidator) validateTicketCas2(serviceURL *url.URL,
 		return nil, err
 	}
 	resBodyStr = string(body)
-	printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
+	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1))
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}
@@ -117,7 +117,7 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 		return nil, err
 	}
 	resBodyStr = string(data)
-	printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
+	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1))
 
 	body := string(data)
 
@@ -178,7 +178,7 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 		return nil, err
 	}
 	resBodyStr = string(body)
-	printHttpLog(validator.parent.logger, r, resp, "", resBodyStr)
+	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1))
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}
