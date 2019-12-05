@@ -50,9 +50,9 @@ type UserInfoDetailResponse struct {
 }
 
 type DepartmentInfoRespose struct {
-	Id                  int    `json:"id"`
+	Id                  int64  `json:"id"`
 	Name                string `json:"name"`
-	SuperId             int    `json:"superId"`
+	SuperId             int64  `json:"superId"`
 	SuperName           string `json:"superName"`
 	Code                string `json:"code"`
 	NcDeptId            string `json:"ncDeptId"`
@@ -62,7 +62,7 @@ type DepartmentInfoRespose struct {
 	ManagerEmail        string `json:"managerEmail"`
 	ManagerName         string `json:"managerName"`
 	DepartCategoryValue string `json:"departCategoryValue"`
-	Status              string `json:"status"`
+	Status              int    `json:"status"`
 }
 
 type PermissionListResponse struct {

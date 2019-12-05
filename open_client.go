@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 )
 
 type OpenClient struct {
@@ -54,7 +53,7 @@ func (c *OpenClient) DepartmentInfoUrl(departmentId int64) (string, string, erro
 		return "", "", err
 	}
 	params := CreateBaseParams(c.appId, c.appKey)
-	params["id"] = strconv.FormatInt(departmentId, 10)
+	params["id"] = departmentId
 	return u.String(), JsonEncode(params), nil
 }
 
@@ -64,6 +63,16 @@ func (c *OpenClient) AllDepartmentInfoUrl() (string, string, error) {
 		return "", "", err
 	}
 	params := CreateBaseParams(c.appId, c.appKey)
+	return u.String(), JsonEncode(params), nil
+}
+
+func (c *OpenClient) AllDepartmentUserUrl(departmentId int64) (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/sso/get_dept_user_list"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["deptId"] = departmentId
 	return u.String(), JsonEncode(params), nil
 }
 
@@ -113,6 +122,22 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
 		return nil, errors.New("error")
 	}
 	re := []*DepartmentInfoRespose{}
+	InterfaceToStruct(r.Data, re)
+	return re, nil
+}
+
+func (c *OpenClient) AllDepartmentUserInfo(departmentId int64) ([]*UserInfoDetailResponse, error) {
+	u, body, err := c.AllDepartmentUserUrl(departmentId)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	_ = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, errors.New("error")
+	}
+	re := []*UserInfoDetailResponse{}
 	InterfaceToStruct(r.Data, re)
 	return re, nil
 }
