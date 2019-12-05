@@ -62,7 +62,8 @@ type DepartmentInfoRespose struct {
 	ManagerEmployeeId   string `json:"managerEmployeeId"`
 	ManagerAccount      string `json:"managerAccount"`
 	ManagerEmail        string `json:"managerEmail"`
-	ManagerName         string `json:"managerName"`
+	ManagerNameZh       string `json:"managerNameZh"`
+	ManagerNameEn       string `json:"managerNameEn"`
 	DepartCategoryValue string `json:"departCategoryValue"`
 	Status              int    `json:"status"`
 }
