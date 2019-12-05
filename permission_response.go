@@ -58,6 +58,8 @@ type DepartmentInfoRespose struct {
 	NcDeptId            string `json:"ncDeptId"`
 	NcDeptSuperId       string `json:"ncDeptSuperId"`
 	NcDeptSuperName     string `json:"ncDeptSuperName"`
+	ManagerId           int64  `json:"managerId"`
+	ManagerEmployeeId   string `json:"managerEmployeeId"`
 	ManagerAccount      string `json:"managerAccount"`
 	ManagerEmail        string `json:"managerEmail"`
 	ManagerName         string `json:"managerName"`
