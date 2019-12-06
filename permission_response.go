@@ -34,6 +34,7 @@ type UserInfoDetailResponse struct {
 	Account           string `json:"account"`
 	NameZh            string `json:"nameZh"`
 	NameEn            string `json:"nameEn"`
+	NameDisplay       string `json:"nameDisplay"`
 	Email             string `json:"email"`
 	Phone             string `json:"phone"`
 	EmployeeId        string `json:"employeeId"`
