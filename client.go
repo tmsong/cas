@@ -122,7 +122,11 @@ func (c *Client) HandleFunc(h func(http.ResponseWriter, *http.Request)) http.Han
 
 // requestURL determines an absolute LoginURL from the http.Request.
 func requestURL(r *http.Request) (*url.URL, error) {
-	u, err := url.Parse(r.URL.String())
+	str := r.URL.String()
+	if ref := r.Referer(); len(ref) > 0 {
+		str = ref
+	}
+	u, err := url.Parse(str)
 	if err != nil {
 		return nil, err
 	}
