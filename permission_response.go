@@ -47,7 +47,7 @@ type UserInfoDetailResponse struct {
 	ManagerEmployeeId string `json:"managerEmployeeId"`
 	DeptName          string `json:"deptName"`
 	DeptCode          string `json:"deptCode"`
-	DeptId            string `json:"deptId"`
+	DeptId            int64  `json:"deptId"`
 }
 
 type DepartmentInfoRespose struct {
