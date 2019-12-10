@@ -158,6 +158,9 @@ func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
 	//q.Add("service", c.clientHost)
 	//q.Add("redirectUrl", c.clientHost.String())
 	jumpTo, err := requestURL(r)
+	if ref := r.Referer(); len(ref) > 0 {
+		jumpTo, err = url.Parse(ref)
+	}
 	if err == nil {
 		q.Add("jumpto", jumpTo.String())
 	}
