@@ -136,7 +136,7 @@ func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoResp
 }
 
 func (validator *PermissionValidator) HasPermissionUrl(userId int64, url string) (string, string, error) {
-	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/has_premission"))
+	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/has_permission"))
 	if err != nil {
 		return "", "", err
 	}
