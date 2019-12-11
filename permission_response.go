@@ -42,6 +42,8 @@ type UserInfoDetailResponse struct {
 	Status            int    `json:"status"`
 	ManagerId         int64  `json:"managerId"`
 	ManagerName       string `json:"managerName"`
+	ManagerNameEn     string `json:"managerNameEn"`
+	ManagerNameZh     string `json:"managerNameZh"`
 	ManagerAccount    string `json:"managerAccount"`
 	ManagerEmail      string `json:"managerEmail"`
 	ManagerEmployeeId string `json:"managerEmployeeId"`
@@ -63,6 +65,7 @@ type DepartmentInfoRespose struct {
 	ManagerEmployeeId   string `json:"managerEmployeeId"`
 	ManagerAccount      string `json:"managerAccount"`
 	ManagerEmail        string `json:"managerEmail"`
+	ManagerName         string `json:"managerName"`
 	ManagerNameZh       string `json:"managerNameZh"`
 	ManagerNameEn       string `json:"managerNameEn"`
 	DepartCategoryValue string `json:"departCategoryValue"`

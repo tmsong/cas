@@ -56,20 +56,34 @@ func JsonDecode(data string, inter interface{}) error {
 	return json.Unmarshal([]byte(data), inter)
 }
 
-func StructToMap(data interface{}) map[string]interface{} {
+func StructToMap(data interface{}) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
-	j, _ := json.Marshal(data)
-	_ = json.Unmarshal(j, &m)
-	return m
+	j, err := json.Marshal(data)
+	if err != nil {
+		return m, err
+	}
+	err = json.Unmarshal(j, &m)
+	if err != nil {
+		return m, err
+	}
+	return m, err
 }
-func MapToStruct(data map[string]interface{}, v interface{}) {
-	j, _ := json.Marshal(data)
-	_ = json.Unmarshal(j, &v)
+func MapToStruct(data map[string]interface{}, v interface{}) error {
+	j, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(j, &v)
+	return err
 }
 
-func ListToStructList(data []interface{}, v interface{}) {
-	j, _ := json.Marshal(data)
-	_ = json.Unmarshal(j, &v)
+func ListToStructList(data []interface{}, v interface{}) error {
+	j, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(j, &v)
+	return err
 }
 
 func InterfaceToStruct(data interface{}, v interface{}) error {
