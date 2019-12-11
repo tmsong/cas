@@ -72,7 +72,10 @@ func ListToStructList(data []interface{}, v interface{}) {
 	_ = json.Unmarshal(j, &v)
 }
 
-func InterfaceToStruct(data interface{}, v interface{}) {
-	j, _ := json.Marshal(data)
-	_ = json.Unmarshal(j, &v)
+func InterfaceToStruct(data interface{}, v interface{}) error {
+	j, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(j, &v)
 }

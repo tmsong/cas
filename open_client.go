@@ -15,6 +15,10 @@ import (
 	"path"
 )
 
+var (
+	ErrRespCode = errors.New("resp code is not 200")
+)
+
 type OpenClient struct {
 	appId   int64
 	appKey  string
@@ -85,12 +89,18 @@ func (c *OpenClient) UserInfoDetail(userId int64, employeeId string) (*UserInfoD
 	}
 	ret := PostByJson(u, body, c.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, ErrRespCode
 	}
 	re := &UserInfoDetailResponse{}
-	InterfaceToStruct(r.Data, re)
+	err = InterfaceToStruct(r.Data, re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -101,12 +111,18 @@ func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose,
 	}
 	ret := PostByJson(u, body, c.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, ErrRespCode
 	}
 	re := &DepartmentInfoRespose{}
-	InterfaceToStruct(r.Data, re)
+	err = InterfaceToStruct(r.Data, re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -118,11 +134,17 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
 	ret := PostByJson(u, body, c.logger)
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
-	if r.Code != 200 {
+	if err != nil {
 		return nil, err
 	}
+	if r.Code != 200 {
+		return nil, ErrRespCode
+	}
 	re := []*DepartmentInfoRespose{}
-	InterfaceToStruct(r.Data, &re)
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -134,10 +156,16 @@ func (c *OpenClient) AllDepartmentUserInfo(departmentId int64) ([]*UserInfoDetai
 	ret := PostByJson(u, body, c.logger)
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
-	if r.Code != 200 {
+	if err != nil {
 		return nil, err
 	}
+	if r.Code != 200 {
+		return nil, ErrRespCode
+	}
 	re := []*UserInfoDetailResponse{}
-	InterfaceToStruct(r.Data, &re)
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
