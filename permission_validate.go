@@ -33,7 +33,10 @@ func (validator *PermissionValidator) HasPermission(userId int64, url string) er
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return err
+	}
 	if r.Code != 200 {
 		return errors.New("no permission")
 	}
@@ -47,12 +50,18 @@ func (validator *PermissionValidator) RoleList(userId int64) ([]RoleListResponse
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, ErrRespCode
 	}
 	re := []RoleListResponse{}
-	InterfaceToStruct(r.Data, &re)
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 func (validator *PermissionValidator) PermissionList(userId, roleId int64) ([]PermissionListResponse, error) {
@@ -62,12 +71,18 @@ func (validator *PermissionValidator) PermissionList(userId, roleId int64) ([]Pe
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, ErrRespCode
 	}
 	re := []PermissionListResponse{}
-	InterfaceToStruct(r.Data, &re)
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -78,12 +93,18 @@ func (validator *PermissionValidator) UserInfo(userId int64) (*UserInfoResponse,
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, ErrRespCode
 	}
 	re := &UserInfoResponse{}
-	InterfaceToStruct(r.Data, re)
+	err = InterfaceToStruct(r.Data, re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -94,12 +115,18 @@ func (validator *PermissionValidator) UserInfoDetail(userId int64, employeeId st
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
 		return nil, errors.New("error")
 	}
 	re := &UserInfoDetailResponse{}
-	InterfaceToStruct(r.Data, re)
+	err = InterfaceToStruct(r.Data, re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -110,12 +137,18 @@ func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*Depar
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
 		return nil, errors.New("error")
 	}
 	re := &DepartmentInfoRespose{}
-	InterfaceToStruct(r.Data, re)
+	err = InterfaceToStruct(r.Data, re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 
@@ -126,12 +159,18 @@ func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoResp
 	}
 	ret := PostByJson(u, body, validator.parent.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
 	if r.Code != 200 {
 		return nil, errors.New("error")
 	}
 	re := []*DepartmentInfoRespose{}
-	InterfaceToStruct(r.Data, &re)
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
 	return re, nil
 }
 

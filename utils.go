@@ -91,9 +91,5 @@ func InterfaceToStruct(data interface{}, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(j, &v)
-	if err != nil {
-		return err
-	}
-	return nil
+	return json.Unmarshal(j, &v)
 }
