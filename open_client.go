@@ -117,9 +117,9 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
 	}
 	ret := PostByJson(u, body, c.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, err
 	}
 	re := []*DepartmentInfoRespose{}
 	InterfaceToStruct(r.Data, re)
@@ -133,9 +133,9 @@ func (c *OpenClient) AllDepartmentUserInfo(departmentId int64) ([]*UserInfoDetai
 	}
 	ret := PostByJson(u, body, c.logger)
 	r := PermissionResponse{}
-	_ = JsonDecode(ret, &r)
+	err = JsonDecode(ret, &r)
 	if r.Code != 200 {
-		return nil, errors.New("error")
+		return nil, err
 	}
 	re := []*UserInfoDetailResponse{}
 	InterfaceToStruct(r.Data, re)
