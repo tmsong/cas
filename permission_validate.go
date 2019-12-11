@@ -131,7 +131,7 @@ func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoResp
 		return nil, errors.New("error")
 	}
 	re := []*DepartmentInfoRespose{}
-	InterfaceToStruct(r.Data, re)
+	InterfaceToStruct(r.Data, &re)
 	return re, nil
 }
 
