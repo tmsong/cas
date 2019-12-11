@@ -40,7 +40,7 @@ func (c *OpenClient) UserInfoDetailUrl(userId int64, employeeId string) (string,
 	}
 	params := CreateBaseParams(c.appId, c.appKey)
 	if len(employeeId) == 0 {
-		params["userId"] = userId
+		params["uid"] = userId
 	} else {
 		params["employeeId"] = employeeId
 	}
