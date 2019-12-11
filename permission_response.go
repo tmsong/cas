@@ -92,7 +92,7 @@ type UserPermissionListResponse struct {
 	PermissionName string `json:"permissionName"`
 	Url            string `json:"url"`
 	Method         int64  `json:"method"`
-	ParentId       int64  `json:"parent_id"`
+	ParentId       int64  `json:"parentId"`
 	IsMenu         int    `json:"isMenu"`
 	OrderBy        int    `json:"orderBy"`
 	Remark         string `json:"remark"`
