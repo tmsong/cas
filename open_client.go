@@ -76,6 +76,17 @@ func (c *OpenClient) AllDepartmentUserUrl(departmentId int64) (string, string, e
 	return u.String(), JsonEncode(params), nil
 }
 
+func (c *OpenClient) UserPermissionListUrl(userId int64, filterMenu bool) (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/user/permission_list"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["userId"] = userId
+	params["filterMenu"] = filterMenu
+	return u.String(), JsonEncode(params), nil
+}
+
 ///////////////////////////////////////////////////////
 
 func (c *OpenClient) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
@@ -138,6 +149,22 @@ func (c *OpenClient) AllDepartmentUserInfo(departmentId int64) ([]*UserInfoDetai
 		return nil, err
 	}
 	re := []*UserInfoDetailResponse{}
+	InterfaceToStruct(r.Data, &re)
+	return re, nil
+}
+
+func (c *OpenClient) UserPermissionList(userId int64, filterMenu bool) ([]*UserPermissionListResponse, error) {
+	u, body, err := c.UserPermissionListUrl(userId, filterMenu)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, err
+	}
+	re := []*UserPermissionListResponse{}
 	InterfaceToStruct(r.Data, &re)
 	return re, nil
 }

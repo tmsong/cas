@@ -82,3 +82,18 @@ type RoleListResponse struct {
 	RoleName  string `json:"roleName"`
 	ValidTime string `json:"validTime"`
 }
+
+type UserPermissionListResponse struct {
+	AppId          int64  `json:"appId"`
+	PermissionKey  string `json:"permissionKey"`
+	PermissionName string `json:"permissionName"`
+	Url            string `json:"url"`
+	Method         int64  `json:"method"`
+	ParentId       int64  `json:"parent_id"`
+	IsMenu         int    `json:"isMenu"`
+	OrderBy        int    `json:"orderBy"`
+	Remark         string `json:"remark"`
+	Status         int    `json:"status"`
+	CreateTime     int64  `json:"createTime"`
+	UpdateTime     int64  `json:"updateTime"`
+}
