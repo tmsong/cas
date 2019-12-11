@@ -122,7 +122,7 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
 		return nil, err
 	}
 	re := []*DepartmentInfoRespose{}
-	InterfaceToStruct(r.Data, re)
+	InterfaceToStruct(r.Data, &re)
 	return re, nil
 }
 
@@ -138,6 +138,6 @@ func (c *OpenClient) AllDepartmentUserInfo(departmentId int64) ([]*UserInfoDetai
 		return nil, err
 	}
 	re := []*UserInfoDetailResponse{}
-	InterfaceToStruct(r.Data, re)
+	InterfaceToStruct(r.Data, &re)
 	return re, nil
 }
