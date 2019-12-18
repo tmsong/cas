@@ -91,6 +91,72 @@ func (c *OpenClient) UserPermissionListUrl(userId int64, filterMenu bool) (strin
 	return u.String(), JsonEncode(params), nil
 }
 
+func (c *OpenClient) UserInfoVagueUrl(
+	account string,
+	accountVague bool,
+	nameZh string,
+	nameZhVague bool,
+	nameEn string,
+	nameEnVague bool,
+	nameDisplay string,
+	nameDisplayVague bool,
+	email string,
+	emailVague bool,
+	phone string,
+	phoneVague bool,
+	employeeId string,
+	employeeIdVague bool,
+) (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/sso/get_user_vague"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	if len(account) > 0 {
+		params["account"] = account
+		if accountVague {
+			params["accountVague"] = accountVague
+		}
+	}
+	if len(nameZh) > 0 {
+		params["nameZh"] = nameZh
+		if nameZhVague {
+			params["nameZhVague"] = nameZhVague
+		}
+	}
+	if len(nameEn) > 0 {
+		params["nameEn"] = nameEn
+		if nameEnVague {
+			params["nameEnVague"] = nameEnVague
+		}
+	}
+	if len(nameDisplay) > 0 {
+		params["nameDisplay"] = nameDisplay
+		if nameDisplayVague {
+			params["nameDisplayVague"] = nameDisplayVague
+		}
+	}
+	if len(email) > 0 {
+		params["email"] = email
+		if emailVague {
+			params["emailVague"] = emailVague
+		}
+	}
+	if len(phone) > 0 {
+		params["phone"] = phone
+		if phoneVague {
+			params["phoneVague"] = phoneVague
+		}
+	}
+	if len(employeeId) > 0 {
+		params["employeeId"] = employeeId
+		if employeeIdVague {
+			params["employeeIdVague"] = employeeIdVague
+		}
+	}
+	return u.String(), JsonEncode(params), nil
+}
+
 ///////////////////////////////////////////////////////
 
 func (c *OpenClient) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
@@ -193,6 +259,49 @@ func (c *OpenClient) UserPermissionList(userId int64, filterMenu bool) ([]*UserP
 		return nil, err
 	}
 	re := []*UserPermissionListResponse{}
+	InterfaceToStruct(r.Data, &re)
+	return re, nil
+}
+
+func (c *OpenClient) UserInfoVague(
+	account string,
+	accountVague bool,
+	nameZh string,
+	nameZhVague bool,
+	nameEn string,
+	nameEnVague bool,
+	nameDisplay string,
+	nameDisplayVague bool,
+	email string,
+	emailVague bool,
+	phone string,
+	phoneVague bool,
+	employeeId string,
+	employeeIdVague bool) ([]*UserInfoVagueResponse, error) {
+	u, body, err := c.UserInfoVagueUrl(account,
+		accountVague,
+		nameZh,
+		nameZhVague,
+		nameEn,
+		nameEnVague,
+		nameDisplay,
+		nameDisplayVague,
+		email,
+		emailVague,
+		phone,
+		phoneVague,
+		employeeId,
+		employeeIdVague)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if r.Code != 200 {
+		return nil, err
+	}
+	re := []*UserInfoVagueResponse{}
 	InterfaceToStruct(r.Data, &re)
 	return re, nil
 }
