@@ -70,13 +70,15 @@ func (c *OpenClient) AllDepartmentInfoUrl() (string, string, error) {
 	return u.String(), JsonEncode(params), nil
 }
 
-func (c *OpenClient) AllDepartmentUserUrl(departmentId int64) (string, string, error) {
+func (c *OpenClient) AllDepartmentUserUrl(departmentId int64, recursive, containsOutgoing bool) (string, string, error) {
 	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/sso/get_dept_user_list"))
 	if err != nil {
 		return "", "", err
 	}
 	params := CreateBaseParams(c.appId, c.appKey)
 	params["deptId"] = departmentId
+	params["recursive"] = recursive
+	params["containsOutgoing"] = containsOutgoing
 	return u.String(), JsonEncode(params), nil
 }
 
@@ -225,8 +227,8 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
 	return re, nil
 }
 
-func (c *OpenClient) AllDepartmentUserInfo(departmentId int64) ([]*UserInfoDetailResponse, error) {
-	u, body, err := c.AllDepartmentUserUrl(departmentId)
+func (c *OpenClient) AllDepartmentUserInfo(departmentId int64, recursive, containsOutgoing bool) ([]*UserInfoDetailResponse, error) {
+	u, body, err := c.AllDepartmentUserUrl(departmentId, recursive, containsOutgoing)
 	if err != nil {
 		return nil, err
 	}
