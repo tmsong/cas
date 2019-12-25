@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
 	"strings"
 )
 
@@ -199,7 +200,11 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 		return nil, nil // not logged in
 	}
 	//todo 这里由于无法解析带时区的时间字符串，故先替换掉
-	resBodyStr = strings.Replace(resBodyStr, "[Asia/Shanghai]", "", 1)
+	//正则替换
+	re3, _ := regexp.Compile(`Z\[\S+/\S+\]`)
+	resBodyStr = re3.ReplaceAllString(resBodyStr, "Z")
+	//resBodyStr = strings.Replace(resBodyStr, "[Asia/Shanghai]", "", 1)
+	//resBodyStr = strings.Replace(resBodyStr, "[Etc/UTC]", "", 1)
 	success, err := ParseServiceResponse([]byte(resBodyStr))
 	if err != nil {
 		return nil, err
