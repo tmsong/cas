@@ -52,6 +52,16 @@ type UserInfoDetailResponse struct {
 	DeptId            int64  `json:"deptId"`
 }
 
+type UserInfoVagueResponse struct {
+	UserId      int64  `json:"userId"`
+	Account     string `json:"account"`
+	NameZh      string `json:"nameZh"`
+	NameEn      string `json:"nameEn"`
+	NameDisplay string `json:"nameDisplay"`
+	Email       string `json:"email"`
+	EmployeeId  string `json:"employeeId"`
+}
+
 type DepartmentInfoRespose struct {
 	Id                  int64  `json:"id"`
 	Name                string `json:"name"`

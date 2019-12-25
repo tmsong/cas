@@ -53,7 +53,11 @@ func (validator *ServiceTicketValidator) validateTicketCas2(serviceURL *url.URL,
 
 	var resBodyStr string
 	resp, err := validator.client.Do(r)
-	defer resp.Body.Close()
+	defer func() {
+		if resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 	if err != nil {
 		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
@@ -106,7 +110,11 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 
 	var resBodyStr string
 	resp, err := validator.client.Do(r)
-	defer resp.Body.Close()
+	defer func() {
+		if resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 	if err != nil {
 		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
@@ -167,7 +175,11 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 
 	var resBodyStr string
 	resp, err := validator.client.Do(r)
-	defer resp.Body.Close()
+	defer func() {
+		if resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 	if err != nil {
 		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
 		return nil, err
