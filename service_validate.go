@@ -201,8 +201,8 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 	}
 	//todo 这里由于无法解析带时区的时间字符串，故先替换掉
 	//正则替换
-	re3, _ := regexp.Compile(`Z\[\S+/\S+\]`)
-	resBodyStr = re3.ReplaceAllString(resBodyStr, "Z")
+	re3, _ := regexp.Compile(`\[\S+/\S+\]`)
+	resBodyStr = re3.ReplaceAllString(resBodyStr, "")
 	//resBodyStr = strings.Replace(resBodyStr, "[Asia/Shanghai]", "", 1)
 	//resBodyStr = strings.Replace(resBodyStr, "[Etc/UTC]", "", 1)
 	success, err := ParseServiceResponse([]byte(resBodyStr))
