@@ -52,10 +52,7 @@ func (s *MemoryStore) Delete(id string) error {
 }
 
 // Clear removes all ticket data
-func (s *MemoryStore) Clear() error {
-	s.mu.Lock()
-	s.store = nil
-	s.mu.Unlock()
+func (s *MemoryStore) Refresh(id string) error {
 	return nil
 }
 

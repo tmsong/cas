@@ -263,6 +263,8 @@ func (c *Client) GetSession(w http.ResponseWriter, r *http.Request) {
 		if t, err := c.tickets.Read(s); err == nil {
 			c.logger.Debugf("Re-used ticket %s for %s", s, t.User)
 
+			c.setSession(cookie.Value, s) //每次有操作都刷新过期时间
+			c.tickets.Refresh(s)          //刷新ticket过期时间
 			setAuthenticationResponse(r, t)
 			return
 		} else {

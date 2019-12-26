@@ -19,11 +19,11 @@ type TicketStore interface {
 	// Write stores the AuthenticationResponse data received from a ticket validation.
 	Write(id string, ticket *AuthenticationResponse) error
 
+	// Refresh the expire time of a ticket
+	Refresh(id string) error
+
 	// Delete removes the AuthenticationResponse data associated with a ticket identifier.
 	Delete(id string) error
-
-	// Clear removes all of the AuthenticationResponse data from the store.
-	Clear() error
 
 	// Copy itself and set a new parent client
 	CopyWithParent(parent *Client) TicketStore
