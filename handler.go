@@ -66,7 +66,7 @@ func (ch *clientHandler) performSingleLogout(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	ch.c.deleteSession(logoutRequest.SessionIndex)
+	//ch.c.deleteSession(logoutRequest.SessionIndex)	wrong use, this 'session index' is not in session store
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "OK")

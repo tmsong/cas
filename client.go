@@ -207,7 +207,7 @@ func (c *Client) PerformSingleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.deleteSession(logoutRequest.SessionIndex)
+	//c.deleteSession(logoutRequest.SessionIndex)	wrong use, this 'session index' is not in session store
 
 	w.WriteHeader(http.StatusOK)
 }
