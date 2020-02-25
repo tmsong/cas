@@ -21,7 +21,7 @@ func (ch *clientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	SetClient(r, ch.c)
 
-	if isSingleLogoutRequest(r) {
+	if IsSingleLogoutRequest(r) {
 		ch.performSingleLogout(w, r)
 		return
 	}
@@ -31,10 +31,10 @@ func (ch *clientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// isSingleLogoutRequest determines if the http.Request is a CAS Single Logout Request.
+// IsSingleLogoutRequest determines if the http.Request is a CAS Single Logout Request.
 //
 // The rules for a SLO request are, HTTP POST urlencoded form with a logoutRequest parameter.
-func isSingleLogoutRequest(r *http.Request) bool {
+func IsSingleLogoutRequest(r *http.Request) bool {
 	if r.Method != "POST" {
 		return false
 	}

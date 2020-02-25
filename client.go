@@ -192,6 +192,26 @@ func (c *Client) LogoutUrlForRequest(r *http.Request) (string, error) {
 	return u.String(), nil
 }
 
+// performSingleLogout processes a single logout request
+func (c *Client) PerformSingleLogout(w http.ResponseWriter, r *http.Request) {
+	rawXML := r.FormValue("logoutRequest")
+	logoutRequest, err := parseLogoutRequest([]byte(rawXML))
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := c.tickets.Delete(logoutRequest.SessionIndex); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	c.deleteSession(logoutRequest.SessionIndex)
+
+	w.WriteHeader(http.StatusOK)
+}
+
 // ServiceValidateUrlForRequest determines the CAS serviceValidate LoginURL for the ticket and http.Request.
 func (c *Client) ServiceValidateUrlForRequest(ticket string, r *http.Request) (string, error) {
 	service, err := requestURL(r)
