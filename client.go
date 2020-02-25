@@ -396,7 +396,7 @@ func (c *Client) clearSession(w http.ResponseWriter, r *http.Request) {
 			c.logger.Errorf("Failed to remove %v from %T: %v", cookie.Value, c.tickets, err)
 		}
 
-		c.deleteSession(s)
+		c.deleteSession(cookie.Value)
 	}
 
 	clearCookie(w, cookie)
