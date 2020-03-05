@@ -183,7 +183,7 @@ func (c *OpenClient) UserInfoDetail(userId int64, employeeId string) (*UserInfoD
 	return re, nil
 }
 
-func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose, error) {
+func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoResponse, error) {
 	u, body, err := c.DepartmentInfoUrl(departmentId)
 	if err != nil {
 		return nil, err
@@ -197,7 +197,7 @@ func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose,
 	if r.Code != 200 {
 		return nil, ErrRespCode
 	}
-	re := &DepartmentInfoRespose{}
+	re := &DepartmentInfoResponse{}
 	err = InterfaceToStruct(r.Data, re)
 	if err != nil {
 		return nil, err
@@ -205,7 +205,7 @@ func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose,
 	return re, nil
 }
 
-func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
+func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoResponse, error) {
 	u, body, err := c.AllDepartmentInfoUrl()
 	if err != nil {
 		return nil, err
@@ -219,7 +219,7 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
 	if r.Code != 200 {
 		return nil, ErrRespCode
 	}
-	re := []*DepartmentInfoRespose{}
+	re := []*DepartmentInfoResponse{}
 	err = InterfaceToStruct(r.Data, &re)
 	if err != nil {
 		return nil, err

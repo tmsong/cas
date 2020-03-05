@@ -62,7 +62,7 @@ type UserInfoVagueResponse struct {
 	EmployeeId  string `json:"employeeId"`
 }
 
-type DepartmentInfoRespose struct {
+type DepartmentInfoResponse struct {
 	Id                  int64  `json:"id"`
 	Name                string `json:"name"`
 	SuperId             int64  `json:"superId"`
@@ -109,4 +109,17 @@ type UserPermissionListResponse struct {
 	Status         int    `json:"status"`
 	CreateTime     int64  `json:"createTime"`
 	UpdateTime     int64  `json:"updateTime"`
+}
+
+type GetSsoUserByDDInfoResponse struct {
+	Id          string `json:"id"`
+	Account     string `json:"account"`
+	NameZh      string `json:"nameZh"`
+	NameEn      string `json:"nameEn"`
+	NameDisplay string `json:"nameDisplay"`
+	Department  string `json:"department"`
+	Email       string `json:"email"`
+	EmployeeId  string `json:"employeeId"`
+	DingdingUid string `json:"dingdingUid"`
+	DeviceId    string `json:"deviceId"`
 }

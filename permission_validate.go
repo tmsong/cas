@@ -130,7 +130,7 @@ func (validator *PermissionValidator) UserInfoDetail(userId int64, employeeId st
 	return re, nil
 }
 
-func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose, error) {
+func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*DepartmentInfoResponse, error) {
 	u, body, err := validator.DepartmentInfoUrl(departmentId)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*Depar
 	if r.Code != 200 {
 		return nil, errors.New("error")
 	}
-	re := &DepartmentInfoRespose{}
+	re := &DepartmentInfoResponse{}
 	err = InterfaceToStruct(r.Data, re)
 	if err != nil {
 		return nil, err
@@ -152,7 +152,7 @@ func (validator *PermissionValidator) DepartmentInfo(departmentId int64) (*Depar
 	return re, nil
 }
 
-func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoRespose, error) {
+func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoResponse, error) {
 	u, body, err := validator.AllDepartmentInfoUrl()
 	if err != nil {
 		return nil, err
@@ -166,7 +166,29 @@ func (validator *PermissionValidator) AllDepartmentInfo() ([]*DepartmentInfoResp
 	if r.Code != 200 {
 		return nil, errors.New("error")
 	}
-	re := []*DepartmentInfoRespose{}
+	re := []*DepartmentInfoResponse{}
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
+	return re, nil
+}
+
+func (validator *PermissionValidator) GetSsoUserByDDInfo(appKey string, dingCode string) (*GetSsoUserByDDInfoResponse, error) {
+	u, body, err := validator.GetSsoUserByDDInfoUrl(appKey, dingCode)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, validator.parent.logger)
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, errors.New("error")
+	}
+	re := &GetSsoUserByDDInfoResponse{}
 	err = InterfaceToStruct(r.Data, &re)
 	if err != nil {
 		return nil, err
@@ -257,5 +279,16 @@ func (validator *PermissionValidator) AllDepartmentInfoUrl() (string, string, er
 		return "", "", err
 	}
 	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
+	return u.String(), JsonEncode(params), nil
+}
+
+func (validator *PermissionValidator) GetSsoUserByDDInfoUrl(appKey string, dingCode string) (string, string, error) {
+	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/cas/get_sso_user_by_dd_info"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(validator.parent.appId, validator.parent.appKey)
+	params["key"] = appKey
+	params["code"] = dingCode
 	return u.String(), JsonEncode(params), nil
 }

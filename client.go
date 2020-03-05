@@ -449,6 +449,11 @@ func (c *Client) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetai
 }
 
 // 获取部门信息详情 from the client
-func (c *Client) DepartmentInfo(departmentId int64) (*DepartmentInfoRespose, error) {
+func (c *Client) DepartmentInfo(departmentId int64) (*DepartmentInfoResponse, error) {
 	return c.pmValidator.DepartmentInfo(departmentId)
+}
+
+// 根据钉钉免登code获取用户信息详情 from the client
+func (c *Client) GetSsoUserByDDInfo(appKey, dingCode string) (*GetSsoUserByDDInfoResponse, error) {
+	return c.pmValidator.GetSsoUserByDDInfo(appKey, dingCode)
 }
