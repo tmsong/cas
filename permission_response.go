@@ -112,7 +112,7 @@ type UserPermissionListResponse struct {
 }
 
 type GetSsoUserByDDInfoResponse struct {
-	Id          string `json:"id"`
+	Id          int64  `json:"id"`
 	Account     string `json:"account"`
 	NameZh      string `json:"nameZh"`
 	NameEn      string `json:"nameEn"`
