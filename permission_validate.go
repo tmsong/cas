@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 )
 
 // NewServiceTicketValidator create a new *ServiceTicketValidator
@@ -283,7 +284,8 @@ func (validator *PermissionValidator) AllDepartmentInfoUrl() (string, string, er
 }
 
 func (validator *PermissionValidator) GetSsoUserByDDInfoUrl(appKey string, dingCode string) (string, string, error) {
-	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/cas/get_sso_user_by_dd_info"))
+	url, _ := validator.parent.urlScheme.Login()
+	u, err := validator.permissionURL.Parse(path.Join(strings.TrimSuffix(url.String(), "login")+"cas", "api/cas/get_sso_user_by_dd_info"))
 	if err != nil {
 		return "", "", err
 	}
