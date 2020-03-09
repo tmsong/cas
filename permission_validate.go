@@ -284,8 +284,8 @@ func (validator *PermissionValidator) AllDepartmentInfoUrl() (string, string, er
 }
 
 func (validator *PermissionValidator) GetSsoUserByDDInfoUrl(appKey string, dingCode string) (string, string, error) {
-	url, _ := validator.parent.urlScheme.Login()
-	u, err := validator.permissionURL.Parse(path.Join(strings.TrimSuffix(url.String(), "login")+"cas", "api/cas/get_sso_user_by_dd_info"))
+	u2, _ := validator.parent.urlScheme.Login()
+	u, err := url.Parse(strings.TrimSuffix(u2.String(), "login") + "cas/api/cas/get_sso_user_by_dd_info")
 	if err != nil {
 		return "", "", err
 	}
