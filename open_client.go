@@ -9,10 +9,11 @@ package cas
 
 import (
 	"errors"
-	"github.com/tmsong/hlog"
 	"net/http"
 	"net/url"
 	"path"
+
+	"github.com/tmsong/hlog"
 )
 
 var (
@@ -306,4 +307,109 @@ func (c *OpenClient) UserInfoVague(
 	re := []*UserInfoVagueResponse{}
 	InterfaceToStruct(r.Data, &re)
 	return re, nil
+}
+
+///////////////////////////////////////////////////////
+
+func (c *OpenClient) FlagAddOption(user, flagKey, parentOptionKey, optionKey, optionName string) error {
+
+	u, _ := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/flag/add_option"))
+
+	params := CreateBaseParams(c.appId, c.appKey)
+
+	params["userKey"] = user
+	params["flagKey"] = flagKey
+	params["parentFlagOptionKey"] = parentOptionKey
+	params["flagOptionKey"] = optionKey
+	params["flagOptionName"] = optionName
+
+	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	r := PermissionResponse{}
+	if err := JsonDecode(ret, &r); err != nil {
+		return err
+	}
+	if r.Code != 200 {
+		return errors.New(r.Message)
+	}
+	return nil
+}
+
+func (c *OpenClient) FlagUpdateOption(user, flagKey, optionKey, optionName string) error {
+	u, _ := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/flag/update_option"))
+
+	params := CreateBaseParams(c.appId, c.appKey)
+
+	params["userKey"] = user
+	params["flagKey"] = flagKey
+	params["flagOptionKey"] = optionKey
+	params["flagOptionName"] = optionName
+	params["status"] = 1
+
+	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	r := PermissionResponse{}
+	if err := JsonDecode(ret, &r); err != nil {
+		return err
+	}
+	if r.Code != 200 {
+		return errors.New(r.Message)
+	}
+	return nil
+}
+
+func (c *OpenClient) FlagDelOption(user, flagKey, optionKey string) error {
+	u, _ := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/flag/remove_flag_option"))
+
+	params := CreateBaseParams(c.appId, c.appKey)
+
+	params["userKey"] = user
+	params["flagKey"] = flagKey
+	params["flagOptionKey"] = optionKey
+
+	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	r := PermissionResponse{}
+	if err := JsonDecode(ret, &r); err != nil {
+		return err
+	}
+	if r.Code != 200 {
+		return errors.New(r.Message)
+	}
+	return nil
+}
+
+func (c *OpenClient) GetUserPolicyList(user string) ([]PolicyData, error) {
+	u, _ := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/user/policy_list"))
+
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["userKey"] = user
+	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+
+	r := PolicyResponse{}
+	if err := JsonDecode(ret, &r); err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, errors.New(r.Message)
+	}
+
+	return r.Data, nil
+}
+
+func (c *OpenClient) GetPolicyByUrl(user, url string) ([]Policy, error) {
+
+	u, _ := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/policy/get_by_url"))
+
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["userKey"] = user
+	params["url"] = url
+	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+
+	r := PolicyByUrlResponse{}
+	if err := JsonDecode(ret, &r); err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, errors.New(r.Message)
+	}
+
+	return r.Data, nil
 }
