@@ -50,3 +50,22 @@ type PolicyByUrlResponse struct {
 	Message string
 	Data    []Policy
 }
+
+type FlagListResponse struct {
+	Success bool
+	Code    int64
+	Message string
+	Data    []FlagDetail
+}
+
+type FlagDetail struct {
+	Id             int64
+	AppId          int64
+	FlagId         int64
+	FlagoptionKey  string
+	FlagoptionName string
+	CustDesc       string
+	Remark         string
+	CreateTime     int64
+	UpdateTime     int64
+}

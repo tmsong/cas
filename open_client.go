@@ -413,3 +413,22 @@ func (c *OpenClient) GetPolicyByUrl(user, url string) ([]Policy, error) {
 
 	return r.Data, nil
 }
+
+func (c *OpenClient) GetFlagOptionList(flagKey, flagRootKey string) ([]FlagDetail, error) {
+
+	u, _ := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/flag/flagOptionList"))
+
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["flagKey"] = flagKey
+	params["parentOptionKey"] = flagRootKey
+
+	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+
+	r := FlagListResponse{}
+
+	if err := JsonDecode(ret, &r); err != nil {
+		return nil, err
+	}
+
+	return r.Data, nil
+}
