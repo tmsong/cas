@@ -108,8 +108,8 @@ func (validator *PermissionValidator) UserInfo(userId int64) (*UserInfoResponse,
 	return re, nil
 }
 
-func (validator *PermissionValidator) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
-	u, body, err := validator.UserInfoDetailUrl(userId, employeeId)
+func (validator *PermissionValidator) UserInfoDetail(userId int64, employeeId string, isAllStatus bool) (*UserInfoDetailResponse, error) {
+	u, body, err := validator.UserInfoDetailUrl(userId, employeeId, isAllStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func (validator *PermissionValidator) UserInfoUrl(userId int64) (string, string,
 	return u.String(), JsonEncode(params), nil
 }
 
-func (validator *PermissionValidator) UserInfoDetailUrl(userId int64, employeeId string) (string, string, error) {
+func (validator *PermissionValidator) UserInfoDetailUrl(userId int64, employeeId string, isAllStatus bool) (string, string, error) {
 	u, err := validator.permissionURL.Parse(path.Join(validator.permissionURL.Path, "api/open/sso/get_user_info_detail"))
 	if err != nil {
 		return "", "", err
@@ -260,6 +260,7 @@ func (validator *PermissionValidator) UserInfoDetailUrl(userId int64, employeeId
 	} else {
 		params["employeeId"] = employeeId
 	}
+	params["isAllStatus"] = isAllStatus
 	return u.String(), JsonEncode(params), nil
 }
 
