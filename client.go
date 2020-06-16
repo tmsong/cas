@@ -444,8 +444,8 @@ func (c *Client) UserInfo(userId int64) (*UserInfoResponse, error) {
 }
 
 // 获取用户信息详情 from the client
-func (c *Client) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
-	return c.pmValidator.UserInfoDetail(userId, employeeId)
+func (c *Client) UserInfoDetail(userId int64, employeeId string, isAllStatus bool) (*UserInfoDetailResponse, error) {
+	return c.pmValidator.UserInfoDetail(userId, employeeId, isAllStatus)
 }
 
 // 获取部门信息详情 from the client
