@@ -38,7 +38,7 @@ func NewOpenClient(appId int64, appKey string, client *http.Client, openURL *url
 	}
 }
 
-func (c *OpenClient) UserInfoDetailUrl(userId int64, employeeId string) (string, string, error) {
+func (c *OpenClient) UserInfoDetailUrl(userId int64, employeeId string, isAllStatus bool) (string, string, error) {
 	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/sso/get_user_info_detail"))
 	if err != nil {
 		return "", "", err
@@ -49,6 +49,7 @@ func (c *OpenClient) UserInfoDetailUrl(userId int64, employeeId string) (string,
 	} else {
 		params["employeeId"] = employeeId
 	}
+	params["isAllStatus"] = isAllStatus
 	return u.String(), JsonEncode(params), nil
 }
 
@@ -80,6 +81,15 @@ func (c *OpenClient) AllDepartmentUserUrl(departmentId int64, recursive, contain
 	params["deptId"] = departmentId
 	params["recursive"] = recursive
 	params["containsOutgoing"] = containsOutgoing
+	return u.String(), JsonEncode(params), nil
+}
+
+func (c *OpenClient) AllCompanyUserUrl() (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "/api/open/upm/user/list"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
 	return u.String(), JsonEncode(params), nil
 }
 
@@ -162,8 +172,8 @@ func (c *OpenClient) UserInfoVagueUrl(
 
 ///////////////////////////////////////////////////////
 
-func (c *OpenClient) UserInfoDetail(userId int64, employeeId string) (*UserInfoDetailResponse, error) {
-	u, body, err := c.UserInfoDetailUrl(userId, employeeId)
+func (c *OpenClient) UserInfoDetail(userId int64, employeeId string, isAllStatus bool) (*UserInfoDetailResponse, error) {
+	u, body, err := c.UserInfoDetailUrl(userId, employeeId, isAllStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -230,6 +240,28 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoResponse, error) {
 
 func (c *OpenClient) AllDepartmentUserInfo(departmentId int64, recursive, containsOutgoing bool) ([]*UserInfoDetailResponse, error) {
 	u, body, err := c.AllDepartmentUserUrl(departmentId, recursive, containsOutgoing)
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, ErrRespCode
+	}
+	re := []*UserInfoDetailResponse{}
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
+	return re, nil
+}
+
+func (c *OpenClient) AllCompanyUserInfo() ([]*UserInfoDetailResponse, error) {
+	u, body, err := c.AllCompanyUserUrl()
 	if err != nil {
 		return nil, err
 	}
