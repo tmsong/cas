@@ -50,6 +50,9 @@ type UserInfoDetailResponse struct {
 	DeptName          string `json:"deptName"`
 	DeptCode          string `json:"deptCode"`
 	DeptId            int64  `json:"deptId"`
+	JoinDate          string `json:"joinDate"`
+	BirthDay          string `json:"birthDay"`
+	OfficeAddress     string `json:"officeAddress"`
 }
 
 type UserInfoVagueResponse struct {
