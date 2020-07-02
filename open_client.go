@@ -93,6 +93,16 @@ func (c *OpenClient) AllCompanyUserUrl() (string, string, error) {
 	return u.String(), JsonEncode(params), nil
 }
 
+func (c *OpenClient) OfficeSiteUsersUrl(officeSite string) (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "/api/open/upm/user/list"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["officeAddress"] = officeSite
+	return u.String(), JsonEncode(params), nil
+}
+
 func (c *OpenClient) UserPermissionListUrl(userId int64, filterMenu bool) (string, string, error) {
 	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/user/permission_list"))
 	if err != nil {
@@ -262,6 +272,28 @@ func (c *OpenClient) AllDepartmentUserInfo(departmentId int64, recursive, contai
 
 func (c *OpenClient) AllCompanyUserInfo() ([]*UserInfoDetailResponse, error) {
 	u, body, err := c.AllCompanyUserUrl()
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, ErrRespCode
+	}
+	re := []*UserInfoDetailResponse{}
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
+	return re, nil
+}
+
+func (c *OpenClient) GetUserInfosByOfficeSite(officeSite string) ([]*UserInfoDetailResponse, error) {
+	u, body, err := c.OfficeSiteUsersUrl(officeSite)
 	if err != nil {
 		return nil, err
 	}
