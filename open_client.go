@@ -103,6 +103,15 @@ func (c *OpenClient) OfficeSiteUsersUrl(officeSite string) (string, string, erro
 	return u.String(), JsonEncode(params), nil
 }
 
+func (c *OpenClient) AllOfficeSiteUrl() (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "/api/open/upm/user/get_all_user_office"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	return u.String(), JsonEncode(params), nil
+}
+
 func (c *OpenClient) UserPermissionListUrl(userId int64, filterMenu bool) (string, string, error) {
 	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/upm/user/permission_list"))
 	if err != nil {
@@ -307,6 +316,28 @@ func (c *OpenClient) GetUserInfosByOfficeSite(officeSite string) ([]*UserInfoDet
 		return nil, ErrRespCode
 	}
 	re := []*UserInfoDetailResponse{}
+	err = InterfaceToStruct(r.Data, &re)
+	if err != nil {
+		return nil, err
+	}
+	return re, nil
+}
+
+func (c *OpenClient) GetAllOfficeSites() ([]*OfficeSiteDetailResponse, error) {
+	u, body, err := c.AllOfficeSiteUrl()
+	if err != nil {
+		return nil, err
+	}
+	ret := PostByJson(u, body, c.logger)
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, ErrRespCode
+	}
+	re := []*OfficeSiteDetailResponse{}
 	err = InterfaceToStruct(r.Data, &re)
 	if err != nil {
 		return nil, err

@@ -126,3 +126,8 @@ type GetSsoUserByDDInfoResponse struct {
 	DingdingUid string `json:"dingdingUid"`
 	DeviceId    string `json:"deviceId"`
 }
+
+type OfficeSiteDetailResponse struct {
+	OfficeAddressId string `json:"officeAddressId"`
+	OfficeAddress   string `json:"officeAddress"`
+}
