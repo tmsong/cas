@@ -199,6 +199,19 @@ func GetCurrentUserId(r *http.Request) int64 {
 	return 0
 }
 
+// MemberOf returns the list of groups which the user belongs to.
+func SetCurrentUserId(r *http.Request, userId int64) {
+	if a := getAuthenticationResponse(r); a == nil {
+		setAuthenticationResponse(r, &AuthenticationResponse{})
+	}
+	a := getAuthenticationResponse(r)
+	if a.Attributes == nil {
+		a.Attributes = make(UserAttributes)
+	}
+	a.Attributes["uid"] = []interface{}{strconv.FormatInt(userId, 10)}
+	return
+}
+
 func HasPermission(r *http.Request) bool {
 	c := GetClient(r)
 	if c == nil {
