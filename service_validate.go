@@ -2,6 +2,7 @@ package cas
 
 import (
 	"fmt"
+	"github.com/tmsong/hlog"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -41,6 +42,7 @@ func (validator *ServiceTicketValidator) ValidateTicket(serviceURL *url.URL, tic
 }
 
 func (validator *ServiceTicketValidator) validateTicketCas2(serviceURL *url.URL, ticket string) (*AuthenticationResponse, error) {
+	field := hlog.GetLogField(LOGTAG_REQUEST_OK)
 	u, err := validator.ServiceValidateUrl(serviceURL, ticket)
 	if err != nil {
 		return nil, err
@@ -60,16 +62,16 @@ func (validator *ServiceTicketValidator) validateTicketCas2(serviceURL *url.URL,
 		}
 	}()
 	if err != nil {
-		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error(), field)
 		return nil, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error(), field)
 		return nil, err
 	}
 	resBodyStr = string(body)
-	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1))
+	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1), field)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}
@@ -97,6 +99,7 @@ func (validator *ServiceTicketValidator) ServiceValidateUrl(serviceURL *url.URL,
 }
 
 func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL, ticket string) (*AuthenticationResponse, error) {
+	field := hlog.GetLogField(LOGTAG_REQUEST_OK)
 	u, err := validator.ValidateUrl1(serviceURL, ticket)
 	if err != nil {
 		return nil, err
@@ -117,16 +120,16 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 		}
 	}()
 	if err != nil {
-		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error(), field)
 		return nil, err
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error(), field)
 		return nil, err
 	}
 	resBodyStr = string(data)
-	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1))
+	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1), field)
 
 	body := string(data)
 
@@ -162,6 +165,7 @@ func (validator *ServiceTicketValidator) ValidateUrl1(serviceURL *url.URL, ticke
 }
 
 func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL, ticket string) (*AuthenticationResponse, error) {
+	field := hlog.GetLogField(LOGTAG_REQUEST_OK)
 	u, err := validator.ValidateUrl3(serviceURL, ticket)
 	if err != nil {
 		return nil, err
@@ -182,16 +186,16 @@ func (validator *ServiceTicketValidator) validateTicketCas3(serviceURL *url.URL,
 		}
 	}()
 	if err != nil {
-		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error(), field)
 		return nil, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		printHttpLog(validator.parent.logger, r, resp, "", err.Error())
+		printHttpLog(validator.parent.logger, r, resp, "", err.Error(), field)
 		return nil, err
 	}
 	resBodyStr = string(body)
-	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1))
+	printHttpLog(validator.parent.logger, r, resp, "", strings.Replace(resBodyStr, "\n", "\t", -1), field)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("cas: validate ticket: %v", resBodyStr)
 	}

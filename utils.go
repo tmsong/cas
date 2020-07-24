@@ -27,6 +27,7 @@ func CreateBaseParams(appId int64, appKey string) map[string]interface{} {
 }
 
 func PostByJson(realUrl string, reqBodyStr string, l *hlog.Logger) string {
+	field := hlog.GetLogField(LOGTAG_REQUEST_OK)
 	payload := strings.NewReader(reqBodyStr)
 	req, _ := http.NewRequest(http.MethodPost, realUrl, payload)
 	req.Header.Add("Content-Type", "application/json")
@@ -40,7 +41,7 @@ func PostByJson(realUrl string, reqBodyStr string, l *hlog.Logger) string {
 	}()
 	body, _ := ioutil.ReadAll(res.Body)
 	resBodyStr := string(body)
-	defer printHttpLog(l, req, res, reqBodyStr, resBodyStr)
+	defer printHttpLog(l, req, res, reqBodyStr, resBodyStr, field)
 	return resBodyStr
 }
 

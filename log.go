@@ -78,8 +78,7 @@ func printLogWithHttpCode(code int, l *hlog.Logger, fields ...logrus.Fields) {
 	}
 }
 
-func printHttpLog(l *hlog.Logger, req *http.Request, res *http.Response, reqBody, resBody string) {
-	field := hlog.GetLogField(LOGTAG_REQUEST_OK)
+func printHttpLog(l *hlog.Logger, req *http.Request, res *http.Response, reqBody, resBody string, fields logrus.Fields) {
 	u := req.URL
 	get, _ := url.ParseQuery(u.RawQuery)
 	post, uErr := url.QueryUnescape(reqBody)
@@ -96,5 +95,5 @@ func printHttpLog(l *hlog.Logger, req *http.Request, res *http.Response, reqBody
 		"method": req.Method,
 		"code":   res.StatusCode,
 	}
-	printLogWithHttpCode(res.StatusCode, l, field, f)
+	printLogWithHttpCode(res.StatusCode, l, fields, f)
 }
