@@ -26,23 +26,29 @@ func CreateBaseParams(appId int64, appKey string) map[string]interface{} {
 	return r
 }
 
-func PostByJson(realUrl string, reqBodyStr string, l *hlog.Logger) string {
+func PostByJson(realUrl string, reqBodyStr string, l *hlog.Logger) (string, error) {
 	field := hlog.GetLogField(LOGTAG_REQUEST_OK)
 	payload := strings.NewReader(reqBodyStr)
 	req, _ := http.NewRequest(http.MethodPost, realUrl, payload)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "Golang CAS client")
 	l.AddHttpTrace(req)
-	res, _ := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
 	defer func() {
-		if res.Body != nil {
+		if res != nil && res.Body != nil {
 			_ = res.Body.Close()
 		}
 	}()
-	body, _ := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
 	resBodyStr := string(body)
 	defer printHttpLog(l, req, res, reqBodyStr, resBodyStr, field)
-	return resBodyStr
+	return resBodyStr, nil
 }
 
 func JsonEncode(data interface{}) string {

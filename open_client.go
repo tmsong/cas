@@ -196,7 +196,10 @@ func (c *OpenClient) UserInfoDetail(userId int64, employeeId string, isAllStatus
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -218,7 +221,10 @@ func (c *OpenClient) DepartmentInfo(departmentId int64) (*DepartmentInfoResponse
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -240,7 +246,10 @@ func (c *OpenClient) AllDepartmentInfo() ([]*DepartmentInfoResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -262,7 +271,13 @@ func (c *OpenClient) AllDepartmentUserInfo(departmentId int64, recursive, contai
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -284,7 +299,10 @@ func (c *OpenClient) AllCompanyUserInfo() ([]*UserInfoDetailResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -306,7 +324,10 @@ func (c *OpenClient) GetUserInfosByOfficeSite(officeSite string) ([]*UserInfoDet
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -328,7 +349,10 @@ func (c *OpenClient) GetAllOfficeSites() ([]*OfficeSiteDetailResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if err != nil {
@@ -350,7 +374,10 @@ func (c *OpenClient) UserPermissionList(userId int64, filterMenu bool) ([]*UserP
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if r.Code != 200 {
@@ -393,7 +420,10 @@ func (c *OpenClient) UserInfoVague(
 	if err != nil {
 		return nil, err
 	}
-	ret := PostByJson(u, body, c.logger)
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
 	r := PermissionResponse{}
 	err = JsonDecode(ret, &r)
 	if r.Code != 200 {
@@ -418,7 +448,10 @@ func (c *OpenClient) FlagAddOption(user, flagKey, parentOptionKey, optionKey, op
 	params["flagOptionKey"] = optionKey
 	params["flagOptionName"] = optionName
 
-	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	ret, err := PostByJson(u.String(), JsonEncode(params), c.logger)
+	if err != nil {
+		return err
+	}
 	r := PermissionResponse{}
 	if err := JsonDecode(ret, &r); err != nil {
 		return err
@@ -440,7 +473,10 @@ func (c *OpenClient) FlagUpdateOption(user, flagKey, optionKey, optionName strin
 	params["flagOptionName"] = optionName
 	params["status"] = 1
 
-	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	ret, err := PostByJson(u.String(), JsonEncode(params), c.logger)
+	if err != nil {
+		return err
+	}
 	r := PermissionResponse{}
 	if err := JsonDecode(ret, &r); err != nil {
 		return err
@@ -460,7 +496,10 @@ func (c *OpenClient) FlagDelOption(user, flagKey, optionKey string) error {
 	params["flagKey"] = flagKey
 	params["flagOptionKey"] = optionKey
 
-	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	ret, err := PostByJson(u.String(), JsonEncode(params), c.logger)
+	if err != nil {
+		return err
+	}
 	r := PermissionResponse{}
 	if err := JsonDecode(ret, &r); err != nil {
 		return err
@@ -476,7 +515,10 @@ func (c *OpenClient) GetUserPolicyList(user string) ([]PolicyData, error) {
 
 	params := CreateBaseParams(c.appId, c.appKey)
 	params["userKey"] = user
-	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	ret, err := PostByJson(u.String(), JsonEncode(params), c.logger)
+	if err != nil {
+		return nil, err
+	}
 
 	r := PolicyResponse{}
 	if err := JsonDecode(ret, &r); err != nil {
@@ -496,7 +538,10 @@ func (c *OpenClient) GetPolicyByUrl(user, url string) ([]Policy, error) {
 	params := CreateBaseParams(c.appId, c.appKey)
 	params["userKey"] = user
 	params["url"] = url
-	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	ret, err := PostByJson(u.String(), JsonEncode(params), c.logger)
+	if err != nil {
+		return nil, err
+	}
 
 	r := PolicyByUrlResponse{}
 	if err := JsonDecode(ret, &r); err != nil {
@@ -517,7 +562,10 @@ func (c *OpenClient) GetFlagOptionList(flagKey, flagRootKey string) ([]FlagDetai
 	params["flagKey"] = flagKey
 	params["parentOptionKey"] = flagRootKey
 
-	ret := PostByJson(u.String(), JsonEncode(params), c.logger)
+	ret, err := PostByJson(u.String(), JsonEncode(params), c.logger)
+	if err != nil {
+		return nil, err
+	}
 
 	r := FlagListResponse{}
 
