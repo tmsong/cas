@@ -56,13 +56,14 @@ type UserInfoDetailResponse struct {
 }
 
 type UserInfoVagueResponse struct {
-	UserId      int64  `json:"userId"`
-	Account     string `json:"account"`
-	NameZh      string `json:"nameZh"`
-	NameEn      string `json:"nameEn"`
-	NameDisplay string `json:"nameDisplay"`
-	Email       string `json:"email"`
-	EmployeeId  string `json:"employeeId"`
+	UserId       int64  `json:"userId"`
+	Account      string `json:"account"`
+	NameZh       string `json:"nameZh"`
+	NameEn       string `json:"nameEn"`
+	NameDisplay  string `json:"nameDisplay"`
+	Email        string `json:"email"`
+	EmployeeId   string `json:"employeeId"`
+	DepartmentId int64  `json:"departmentId"`
 }
 
 type DepartmentInfoResponse struct {
