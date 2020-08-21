@@ -53,6 +53,16 @@ func (c *OpenClient) UserInfoDetailUrl(userId int64, employeeId string, isAllSta
 	return u.String(), JsonEncode(params), nil
 }
 
+func (c *OpenClient) UserAvailableAppListUrl(userId int64) (string, string, error) {
+	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "/api/open/sso/get_app_list"))
+	if err != nil {
+		return "", "", err
+	}
+	params := CreateBaseParams(c.appId, c.appKey)
+	params["userId"] = userId
+	return u.String(), JsonEncode(params), nil
+}
+
 func (c *OpenClient) DepartmentInfoUrl(departmentId int64) (string, string, error) {
 	u, err := c.openUrl.Parse(path.Join(c.openUrl.Path, "api/open/sso/dept/get_dept"))
 	if err != nil {
@@ -209,6 +219,31 @@ func (c *OpenClient) UserInfoDetail(userId int64, employeeId string, isAllStatus
 		return nil, ErrRespCode
 	}
 	re := &UserInfoDetailResponse{}
+	err = InterfaceToStruct(r.Data, re)
+	if err != nil {
+		return nil, err
+	}
+	return re, nil
+}
+
+func (c *OpenClient) UserAvailableAppList(userId int64) (*UserAvailableAppListResponse, error) {
+	u, body, err := c.UserAvailableAppListUrl(userId)
+	if err != nil {
+		return nil, err
+	}
+	ret, err := PostByJson(u, body, c.logger)
+	if err != nil {
+		return nil, err
+	}
+	r := PermissionResponse{}
+	err = JsonDecode(ret, &r)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 200 {
+		return nil, ErrRespCode
+	}
+	re := &UserAvailableAppListResponse{}
 	err = InterfaceToStruct(r.Data, re)
 	if err != nil {
 		return nil, err

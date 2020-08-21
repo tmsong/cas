@@ -55,6 +55,13 @@ type UserInfoDetailResponse struct {
 	OfficeAddress     string `json:"officeAddress"`
 }
 
+type UserAvailableAppListResponse struct {
+	AppId   string `json:"appId"`
+	AppIcon string `json:"appIcon"`
+	AppName string `json:"appName"`
+	AppUrl  string `json:"appUrl"`
+}
+
 type UserInfoVagueResponse struct {
 	UserId            int64  `json:"userId"`
 	Account           string `json:"account"`
