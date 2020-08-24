@@ -55,7 +55,7 @@ type UserInfoDetailResponse struct {
 	OfficeAddress     string `json:"officeAddress"`
 }
 
-type UserAvailableAppListResponse struct {
+type UserAvailableAppResponse struct {
 	AppId   string `json:"appId"`
 	AppIcon string `json:"appIcon"`
 	AppName string `json:"appName"`

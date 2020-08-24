@@ -226,7 +226,7 @@ func (c *OpenClient) UserInfoDetail(userId int64, employeeId string, isAllStatus
 	return re, nil
 }
 
-func (c *OpenClient) UserAvailableAppList(userId int64) (*UserAvailableAppListResponse, error) {
+func (c *OpenClient) UserAvailableAppList(userId int64) ([]*UserAvailableAppResponse, error) {
 	u, body, err := c.UserAvailableAppListUrl(userId)
 	if err != nil {
 		return nil, err
@@ -243,7 +243,7 @@ func (c *OpenClient) UserAvailableAppList(userId int64) (*UserAvailableAppListRe
 	if r.Code != 200 {
 		return nil, ErrRespCode
 	}
-	re := &UserAvailableAppListResponse{}
+	re := []*UserAvailableAppResponse{}
 	err = InterfaceToStruct(r.Data, re)
 	if err != nil {
 		return nil, err
