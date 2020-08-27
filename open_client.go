@@ -244,7 +244,7 @@ func (c *OpenClient) UserAvailableAppList(userId int64) ([]*UserAvailableAppResp
 		return nil, ErrRespCode
 	}
 	re := []*UserAvailableAppResponse{}
-	err = InterfaceToStruct(r.Data, re)
+	err = InterfaceToStruct(r.Data, &re)
 	if err != nil {
 		return nil, err
 	}
