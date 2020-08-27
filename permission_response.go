@@ -60,6 +60,7 @@ type UserAvailableAppResponse struct {
 	AppIcon string `json:"appIcon"`
 	AppName string `json:"appName"`
 	AppUrl  string `json:"appUrl"`
+	Select  int64  `json:"select"`
 }
 
 type UserInfoVagueResponse struct {
