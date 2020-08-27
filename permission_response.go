@@ -56,7 +56,7 @@ type UserInfoDetailResponse struct {
 }
 
 type UserAvailableAppResponse struct {
-	AppId   string `json:"appId"`
+	AppId   int64  `json:"appId"`
 	AppIcon string `json:"appIcon"`
 	AppName string `json:"appName"`
 	AppUrl  string `json:"appUrl"`
