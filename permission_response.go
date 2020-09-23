@@ -54,6 +54,7 @@ type UserInfoDetailResponse struct {
 	BirthDay          string `json:"birthDay"`
 	OfficeAddress     string `json:"officeAddress"`
 	ContractEndDate   string `json:"contractEndDate"`
+	ContractType      string `json:"contractType"`
 	TrialEndDate      string `json:"trialEndDate"`
 	Hrbp              string `json:"hrbp"`
 }
