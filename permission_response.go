@@ -84,6 +84,10 @@ type UserInfoVagueResponse struct {
 	ManagerEmployeeId string `json:"managerEmployeeId"`
 	DeptName          string `json:"deptName"`
 	DeptId            int64  `json:"deptId"`
+	ContractEndDate   string `json:"contractEndDate"`
+	ContractType      string `json:"contractType"`
+	TrialEndDate      string `json:"trialEndDate"`
+	Hrbp              string `json:"hrbp"`
 }
 
 type DepartmentInfoResponse struct {
